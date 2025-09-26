@@ -2,6 +2,13 @@
 
 All notable changes to `laravel-enums-plus` will be documented in this file.
 
+## v3.0.1 - 2025-09-26
+
+### What's Changed
+
+* Bump composer version because of mismatch.
+* Update readme with new methods
+
 ## v3.0.0 - 2025-09-26
 
 ### What's Changed
