@@ -1,5 +1,5 @@
 <?php
 
-use Webfox\LaravelBackedEnums\Tests\TestCase;
+namespace Rea\LaravelEnumsPlus\Tests;
 
-uses(TestCase::class)->in(__DIR__);
+pest()->extend(TestCase::class)->in(__DIR__);

@@ -1,11 +1,12 @@
 <?php
 
-namespace Webfox\LaravelBackedEnums;
+namespace Rea\LaravelEnumsPlus;
 
+use Illuminate\Foundation\Console\EnumMakeCommand;
 use Spatie\LaravelPackageTools\Package;
 use Spatie\LaravelPackageTools\PackageServiceProvider;
 
-class LaravelBackedEnumsServiceProvider extends PackageServiceProvider
+class LaravelEnumsPlusServiceProvider extends PackageServiceProvider
 {
     public function configurePackage(Package $package): void
     {
@@ -15,13 +16,12 @@ class LaravelBackedEnumsServiceProvider extends PackageServiceProvider
          * More info: https://github.com/spatie/laravel-package-tools
          */
         $package
-            ->name('laravel-backed-enums')
+            ->name('laravel-enums-plus')
             ->hasConfigFile();
 
-
         /** @noinspection PhpFullyQualifiedNameUsageInspection */
-        if (class_exists(\Illuminate\Foundation\Console\EnumMakeCommand::class)) {
-            $package->hasConsoleCommand(LaravelBackedEnumMakeCommand::class);
+        if (class_exists(EnumMakeCommand::class)) {
+            $package->hasConsoleCommand(LaravelEnumsPlusMakeCommand::class);
         }
     }
 }

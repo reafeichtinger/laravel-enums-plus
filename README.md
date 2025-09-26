@@ -1,21 +1,21 @@
-![Banner Image](https://banners.beyondco.de/Laravel%20Backed%20Enums.png?theme=light&packageManager=composer+require&packageName=webfox%2Flaravel-backed-enums&pattern=architect&style=style_1&description=Supercharge+your+PHP8+backed+enums+in+Laravel.&md=1&showWatermark=0&fontSize=125px&images=https%3A%2F%2Flaravel.com%2Fimg%2Flogomark.min.svg)
+![Banner Image](https://banners.beyondco.de/Laravel%20Enums%20Plus.png?theme=light&packageManager=composer+require&packageName=reafeichtinger%2Flaravel-enums-plus&pattern=architect&style=style_1&description=Supercharge+your+PHP8+enums+in+Laravel.&md=1&showWatermark=0&fontSize=125px&images=https%3A%2F%2Flaravel.com%2Fimg%2Flogomark.min.svg)
 
-[![Latest Version on Packagist](https://img.shields.io/packagist/v/webfox/laravel-backed-enums.svg?style=flat-square)](https://packagist.org/packages/webfox/laravel-backed-enums)
-[![Total Downloads](https://img.shields.io/packagist/dt/webfox/laravel-backed-enums.svg?style=flat-square)](https://packagist.org/packages/webfox/laravel-backed-enums)
+[![Latest Version on Packagist](https://img.shields.io/packagist/v/reafeichtinger/laravel-enums-plus.svg?style=flat-square)](https://packagist.org/packages/reafeichtinger/laravel-enums-plus)
+[![Total Downloads](https://img.shields.io/packagist/dt/reafeichtinger/laravel-enums-plus.svg?style=flat-square)](https://packagist.org/packages/reafeichtinger/laravel-enums-plus)
 
-This package supercharges your PHP8 backed enums with superpowers like localization support and fluent comparison methods.
+This package supercharges your PHP8 enums with superpowers like localization support and fluent comparison methods.
 
 ## Installation
 
 ```bash
-composer require webfox/laravel-backed-enums
+composer require reafeichtinger/laravel-enums-plus
 ```
 
 ## Usage
 
 ### Make Command
 
-Creating a new Laravel Backed Enum is easy with the make:enum command.
+Creating a new Laravel Enum is easy with the make:enum command.
 
 #### Command:
 
@@ -53,16 +53,16 @@ This will generate an OrderStatusEnums in the `app/Enums` directory.
 
 ### Upgrade your existing enums
 
-The enum you create must implement the `BackedEnum` interface and also use the `IsBackedEnum` trait.
+The enum you create must implement the `EnumPlus` interface and also use the `IsEnumPlus` trait.
 The interface is required for Laravel to cast your enum correctly and the trait is what gives your enum its superpowers.
 
 ```php
-use Webfox\LaravelBackedEnums\BackedEnum;
-use Webfox\LaravelBackedEnums\IsBackedEnum;
+use Rea\LaravelEnumsPlus\EnumPlus;
+use Rea\LaravelEnumsPlus\IsEnumPlus;
 
-enum VolumeUnitEnum: string implements BackedEnum
+enum VolumeUnitEnum: string implements EnumPlus
 {
-    use IsBackedEnum;
+    use IsEnumPlus;
 
     case MILLIGRAMS = "milligrams";
     case GRAMS = "grams";
@@ -99,6 +99,34 @@ VolumeUnitEnum::labelFor(VolumeUnitEnum::TONNE); // "t"
 ```
 
 If you do not specify a label in the lang file these methods will return the value assigned to the enum inside the enum file. e.g MILLIGRAMS label will be milligrams.
+
+#### Dynamic translations
+
+You can also add translations directly to the enum file. Translations support the full feature catalouge of laravel translations, meaning pluralization and placeholders.
+
+Create a `translations` method on your enum.
+
+```php
+public function translations(): array
+{
+    return [
+        'en' => [
+            self::GRAMS->value => ':count gram|:count grams',
+            self::MILLIGRAMS->value => ':count milligram|:count milligrams',
+            self::KILOGRAMS->value => ':count kilogram|:count kilograms',
+            self::TONNE->value => ':count tonne|:count tonnes',
+        ],
+        'de' => [
+            self::GRAMS->value => ':count Gram|:count Gram',
+            self::MILLIGRAMS->value => ':count Milligram|:count Milligram',
+            self::KILOGRAMS->value => ':count Kilogram|:count Kilogram',
+            self::TONNE->value => ':count Tonne|:count Tonnen',
+        ],
+    ];
+}
+```
+
+If you do not specify a `translations` method, it will fallback to the enums.php translation file.
 
 ### Meta data
 
@@ -350,7 +378,7 @@ VolumeUnitEnum::MILLIGRAMS->isNotAny([VolumeUnitEnum::GRAMS, VolumeUnitEnum::MIL
 
 ### rule
 
-The backed enums may be validated using Laravel's standard Enum validation rule - `new Illuminate\Validation\Rules\Enum(VolumeUnitEnum::class)`.  
+The enums may be validated using Laravel's standard Enum validation rule - `new Illuminate\Validation\Rules\Enum(VolumeUnitEnum::class)`.  
 This method a shortcut for the validation rule.
 
 #### Usage

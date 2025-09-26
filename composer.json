@@ -1,17 +1,25 @@
 {
-    "name": "webfox/laravel-backed-enums",
-    "description": "Supercharge your PHP8 backed enums with superpowers like localization support and fluent comparison methods.",
+    "name": "reafeichtinger/laravel-enums-plus",
+    "description": "Supercharge your PHP8 enums with powers like localization support and fluent comparison methods.",
     "keywords": [
         "webfox",
+        "rea",
+        "reafeichtinger",
         "laravel",
-        "laravel-backed-enums"
+        "laravel-backed-enums",
+        "laravel-enums-plus"
     ],
-    "homepage": "https://github.com/webfox/laravel-backed-enums",
+    "homepage": "https://github.com/reafeichtinger/laravel-enums-plus",
     "license": "MIT",
     "authors": [
         {
             "name": "Webfox Developments Ltd",
             "email": "developers@webfox.co.nz",
+            "role": "Developer"
+        },
+        {
+            "name": "Rea Feichtinger",
+            "email": "rea@feichtinger.dev",
             "role": "Developer"
         }
     ],
@@ -35,12 +43,12 @@
     },
     "autoload": {
         "psr-4": {
-            "Webfox\\LaravelBackedEnums\\": "src"
+            "Rea\\LaravelEnumsPlus\\": "src"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "Webfox\\LaravelBackedEnums\\Tests\\": "tests",
+            "Rea\\LaravelEnumsPlus\\Tests\\": "tests",
             "Workbench\\App\\": "workbench/app/",
             "Workbench\\Database\\Factories\\": "workbench/database/factories/",
             "Workbench\\Database\\Seeders\\": "workbench/database/seeders/"
@@ -78,7 +86,7 @@
     "extra": {
         "laravel": {
             "providers": [
-                "Webfox\\LaravelBackedEnums\\LaravelBackedEnumsServiceProvider"
+                "Rea\\LaravelEnumsPlus\\LaravelEnumsPlusServiceProvider"
             ]
         }
     },

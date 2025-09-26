@@ -1,26 +1,42 @@
 <?php
 
+use Illuminate\Validation\Rules\Enum;
 use Workbench\App\Enums\VolumeUnitEnum;
-use Workbench\App\Enums\VolumeUnitWithoutMetaEnum;
+use Workbench\App\Enums\VolumeUnitWithoutExtrasEnum;
 
 it('can create an enum', function () {
     expect(VolumeUnitEnum::GRAMS->value)->toEqual('grams');
 });
 
 it('can get the label', function () {
-    expect(VolumeUnitEnum::GRAMS->label())->toEqual('g')
-        ->and(VolumeUnitEnum::labelFor(VolumeUnitEnum::GRAMS))->toEqual('g');
+    // Dynamic translation from enum
+    expect(VolumeUnitEnum::GRAMS->label())->toEqual('1 gram')
+        ->and(VolumeUnitEnum::labelFor(VolumeUnitEnum::GRAMS))->toEqual('1 gram');
+
+    expect(VolumeUnitEnum::GRAMS->label(2))->toEqual('2 grams')
+        ->and(VolumeUnitEnum::labelFor(VolumeUnitEnum::GRAMS, 2))->toEqual('2 grams');
+
+    $count = rand(2, 999);
+    expect(VolumeUnitEnum::GRAMS->label($count, ['count' => "Weight = $count"]))->toEqual("Weight = $count grams")
+        ->and(VolumeUnitEnum::labelFor(VolumeUnitEnum::GRAMS, $count, ['count' => "Weight = $count"]))->toEqual("Weight = $count grams");
+
+    // Static translation from lang/en
+    expect(VolumeUnitWithoutExtrasEnum::GRAMS->label())->toEqual('g')
+        ->and(VolumeUnitWithoutExtrasEnum::labelFor(VolumeUnitWithoutExtrasEnum::GRAMS))->toEqual('g');
+
+    expect(VolumeUnitWithoutExtrasEnum::GRAMS->label(2))->toEqual('g')
+        ->and(VolumeUnitWithoutExtrasEnum::labelFor(VolumeUnitWithoutExtrasEnum::GRAMS, 2))->toEqual('g');
 });
 
 it('can get the metadata', function () {
-    expect(VolumeUnitWithoutMetaEnum::GRAMS->toArray())->toMatchArray([
-        'meta' => []
+    expect(VolumeUnitWithoutExtrasEnum::GRAMS->toArray())->toMatchArray([
+        'meta' => [],
     ])
         ->and(VolumeUnitEnum::GRAMS->toArray())->toMatchArray([
             'meta' => [
                 'background_color' => 'bg-red-100',
-                'text_color'       => 'text-red-800',
-            ]
+                'text_color' => 'text-red-800',
+            ],
         ]);
 
 });
@@ -28,41 +44,41 @@ it('can get the metadata', function () {
 it('can list all options', function () {
     expect(VolumeUnitEnum::options())->toEqual([
         [
-            'name'  => 'MILLIGRAMS',
+            'name' => 'MILLIGRAMS',
             'value' => 'milligrams',
-            'label' => 'mg',
-            'meta'  => [
+            'label' => '1 milligram',
+            'meta' => [
                 'background_color' => 'bg-green-100',
-                'text_color'       => 'text-green-800',
-            ]
-        ],
-        [
-            'name'  => 'GRAMS',
-            'value' => 'grams',
-            'label' => 'g',
-            'meta'  => [
-                'background_color' => 'bg-red-100',
-                'text_color'       => 'text-red-800',
-            ]
-        ],
-        [
-            'name'  => 'KILOGRAMS',
-            'value' => 'kilograms',
-            'label' => 'kg',
-            'meta'  => [
-                'background_color' => 'bg-gray-100',
-                'text_color'       => 'text-gray-800',
-            ]
-        ],
-        [
-            'name'  => 'TONNE',
-            'value' => 'tonne',
-            'label' => 't',
-            'meta'  => [
-                'background_color' => 'bg-gray-100',
-                'text_color'       => 'text-gray-800',
+                'text_color' => 'text-green-800',
             ],
-        ]
+        ],
+        [
+            'name' => 'GRAMS',
+            'value' => 'grams',
+            'label' => '1 gram',
+            'meta' => [
+                'background_color' => 'bg-red-100',
+                'text_color' => 'text-red-800',
+            ],
+        ],
+        [
+            'name' => 'KILOGRAMS',
+            'value' => 'kilograms',
+            'label' => '1 kilogram',
+            'meta' => [
+                'background_color' => 'bg-gray-100',
+                'text_color' => 'text-gray-800',
+            ],
+        ],
+        [
+            'name' => 'TONNE',
+            'value' => 'tonne',
+            'label' => '1 tonne',
+            'meta' => [
+                'background_color' => 'bg-gray-100',
+                'text_color' => 'text-gray-800',
+            ],
+        ],
     ]);
 });
 
@@ -86,40 +102,40 @@ it('can get the values', function () {
 
 it('can get the labels', function () {
     expect(VolumeUnitEnum::labels())->toEqual([
-        'mg',
-        'g',
-        'kg',
-        't',
+        '1 milligram',
+        '1 gram',
+        '1 kilogram',
+        '1 tonne',
     ]);
 });
 
 it('can get the value => label map', function () {
     expect(VolumeUnitEnum::map())->toEqual([
-        'milligrams' => 'mg',
-        'grams'      => 'g',
-        'kilograms'  => 'kg',
-        'tonne'      => 't',
+        'milligrams' => '1 milligram',
+        'grams' => '1 gram',
+        'kilograms' => '1 kilogram',
+        'tonne' => '1 tonne',
     ]);
 });
 
 it('can convert a single value to an array', function () {
     expect(VolumeUnitEnum::MILLIGRAMS->toArray())->toEqual([
-        'name'  => 'MILLIGRAMS',
+        'name' => 'MILLIGRAMS',
         'value' => 'milligrams',
-        'label' => 'mg',
-        'meta'  => [
+        'label' => '1 milligram',
+        'meta' => [
             'background_color' => 'bg-green-100',
-            'text_color'       => 'text-green-800',
-        ]
+            'text_color' => 'text-green-800',
+        ],
     ]);
 });
 
 it('will return the label if toHtml it called', function () {
-    expect(VolumeUnitEnum::MILLIGRAMS->toHtml())->toEqual('mg');
+    expect(VolumeUnitEnum::MILLIGRAMS->toHtml())->toEqual('1 milligram');
 });
 
 it('will return the json string format of toArray if toJson is called', function () {
-    expect(VolumeUnitEnum::MILLIGRAMS->toJson())->toEqual('{"name":"MILLIGRAMS","value":"milligrams","label":"mg","meta":{"background_color":"bg-green-100","text_color":"text-green-800"}}');
+    expect(VolumeUnitEnum::MILLIGRAMS->toJson())->toEqual('{"name":"MILLIGRAMS","value":"milligrams","label":"1 milligram","meta":{"background_color":"bg-green-100","text_color":"text-green-800"}}');
 });
 
 it('can compare enums', function () {
@@ -168,10 +184,10 @@ it('can negative compare enums', function () {
 });
 
 it('throws an exception when comparing against an invalid value', function () {
-    expect(fn() => VolumeUnitEnum::MILLIGRAMS->is('invalid'))
+    expect(fn () => VolumeUnitEnum::MILLIGRAMS->is('invalid'))
         ->toThrow('"invalid" is not a valid backing value for enum Workbench\App\Enums\VolumeUnitEnum');
 });
 
 it('can get the validation rule', function () {
-    expect(VolumeUnitEnum::rule())->toBeInstanceOf(\Illuminate\Validation\Rules\Enum::class);
+    expect(VolumeUnitEnum::rule())->toBeInstanceOf(Enum::class);
 });

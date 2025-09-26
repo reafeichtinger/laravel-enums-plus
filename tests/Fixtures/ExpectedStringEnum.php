@@ -2,16 +2,15 @@
 
 namespace Workbench\App\Enums;
 
-use Webfox\LaravelBackedEnums\BackedEnum;
-use Webfox\LaravelBackedEnums\IsBackedEnum;
+use Rea\LaravelEnumsPlus\EnumPlus;
+use Rea\LaravelEnumsPlus\IsEnumPlus;
 
-enum StringEnum: string implements BackedEnum
+enum StringEnum: string implements EnumPlus
 {
-    use IsBackedEnum;
+    use IsEnumPlus;
 
     /**
      * Add your Enums below using.
      * e.g. case Standard = 'standard';
      */
-
 }

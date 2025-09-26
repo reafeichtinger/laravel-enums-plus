@@ -2,10 +2,10 @@
 
 namespace Workbench\App\Models;
 
-use Illuminate\Support\Collection;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Collection;
+use Rea\LaravelEnumsPlus\Casts\AsFullEnumCollection;
 use Workbench\App\Enums\VolumeUnitEnum;
-use Webfox\LaravelBackedEnums\Casts\AsFullEnumCollection;
 
 /**
  * @property VolumeUnitEnum $cast_a
@@ -14,7 +14,6 @@ use Webfox\LaravelBackedEnums\Casts\AsFullEnumCollection;
  */
 class TestModel extends Model
 {
-
     protected $fillable = [
         'cast_a',
         'collection_a',

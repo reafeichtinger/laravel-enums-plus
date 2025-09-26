@@ -2,10 +2,11 @@
 
 use Illuminate\Support\Collection;
 use Workbench\App\Enums\VolumeUnitEnum;
+use Workbench\App\Models\TestModel;
 
 it('can test', function () {
-    $model = new \Workbench\App\Models\TestModel([
-        'cast_a'       => 'grams',
+    $model = new TestModel([
+        'cast_a' => 'grams',
         'collection_a' => ['grams', 'kilograms'],
         'collection_b' => ['grams', 'kilograms'],
     ]);
@@ -29,6 +30,5 @@ it('can test', function () {
             VolumeUnitEnum::GRAMS->toArray(),
             VolumeUnitEnum::KILOGRAMS->toArray(),
         ]);
-
 
 });

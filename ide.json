@@ -2,12 +2,12 @@
   "$schema": "https://laravel-ide.com/schema/laravel-ide-v2.json",
   "codeGenerations": [
     {
-      "id": "webfox.create-backed-enum",
-      "name": "Create Backed Enum",
+      "id": "rea.create-enum-plus",
+      "name": "Create Enum Plus",
       "classSuffix": "Enum",
       "parameters": [
         {
-          "id": "webfox.create-backed-enum:type",
+          "id": "rea.create-enum:type",
           "name": "Type",
           "type": "combobox",
           "options": {
@@ -23,8 +23,8 @@
           "name": "${INPUT_CLASS|className|upperCamelCase}.php",
           "template": {
             "type": "stub",
-            "path": "/stubs/laravel-backed-enum.stub",
-            "fallbackPath": "stubs/laravel-backed-enum.stub",
+            "path": "/stubs/laravel-enums-plus.stub",
+            "fallbackPath": "stubs/laravel-enums-plus.stub",
             "parameters": {
               "{{ class }}": "${INPUT_CLASS|className|upperCamelCase}",
               "{{ namespace }}": "${INPUT_FQN|namespace}",

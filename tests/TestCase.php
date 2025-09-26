@@ -1,9 +1,9 @@
 <?php
 
-namespace Webfox\LaravelBackedEnums\Tests;
+namespace Rea\LaravelEnumsPlus\Tests;
 
 use Orchestra\Testbench\TestCase as Orchestra;
-use Webfox\LaravelBackedEnums\LaravelBackedEnumsServiceProvider;
+use Rea\LaravelEnumsPlus\LaravelEnumsPlusServiceProvider;
 
 class TestCase extends Orchestra
 {
@@ -12,15 +12,15 @@ class TestCase extends Orchestra
         parent::setUp();
     }
 
-    protected function getPackageProviders($app)
+    protected function getPackageProviders($app): array
     {
         return [
-            LaravelBackedEnumsServiceProvider::class,
+            LaravelEnumsPlusServiceProvider::class,
         ];
     }
 
     public static function applicationBasePath(): string
     {
-        return __DIR__.'/../workbench';
+        return __DIR__ . '/../workbench';
     }
 }

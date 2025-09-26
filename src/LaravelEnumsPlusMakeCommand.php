@@ -1,19 +1,20 @@
 <?php
 
-namespace Webfox\LaravelBackedEnums;
+namespace Rea\LaravelEnumsPlus;
 
-use InvalidArgumentException;
 use Illuminate\Foundation\Console\EnumMakeCommand;
+use InvalidArgumentException;
 
-class LaravelBackedEnumMakeCommand extends EnumMakeCommand
+class LaravelEnumsPlusMakeCommand extends EnumMakeCommand
 {
-    protected $description = 'Create a new laravel backed enum';
+    protected $description = 'Create a new laravel enum';
 
     protected function getStub(): string
     {
         if ($this->option('string') || $this->option('int')) {
-            return $this->resolveStubPath('/stubs/laravel-backed-enum.stub');
+            return $this->resolveStubPath('/stubs/laravel-enums-plus.stub');
         }
+
         return parent::getStub();
     }
 
@@ -26,9 +27,9 @@ class LaravelBackedEnumMakeCommand extends EnumMakeCommand
                 parent::buildClass($name)
             );
         }
+
         return parent::buildClass($name);
     }
-
 
     protected function resolveStubPath($stub): string
     {
@@ -37,8 +38,8 @@ class LaravelBackedEnumMakeCommand extends EnumMakeCommand
             return $customPath;
         }
 
-        if (file_exists(__DIR__ . "/../" . $stub)) {
-            return __DIR__ . "/../" . $stub;
+        if (file_exists(__DIR__ . '/../' . $stub)) {
+            return __DIR__ . '/../' . $stub;
         }
 
         return parent::resolveStubPath($stub);

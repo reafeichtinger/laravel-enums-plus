@@ -1,16 +1,16 @@
 <?php
 
-namespace Workbench\App\Enums;
+namespace {{ namespace }};
 
 use Rea\LaravelEnumsPlus\EnumPlus;
 use Rea\LaravelEnumsPlus\IsEnumPlus;
 
-enum IntEnum: int implements EnumPlus
+enum {{ class }}: {{ type }} implements EnumPlus
 {
     use IsEnumPlus;
 
     /**
      * Add your Enums below using.
-     * e.g. case Standard = 0;
+     * e.g. case Standard = {{ value }};
      */
 }

@@ -1,0 +1,6 @@
+{
+    "recommendations": [
+        "open-southeners.laravel-pint", // Laravel Pint (formatting)
+        "bmewburn.vscode-intelephense-client", // PHP Intelephense (language support for php)
+    ]
+}
