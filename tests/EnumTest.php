@@ -1,10 +1,13 @@
 <?php
 
 use Illuminate\Validation\Rules\Enum;
+use Workbench\App\Enums\EnumWithoutInterface;
 use Workbench\App\Enums\VolumeUnitEnum;
 use Workbench\App\Enums\VolumeUnitWithoutExtrasEnum;
 
 it('can create an enum', function () {
+    $instance = VolumeUnitEnum::GRAMS;
+    expect($instance)->toEqual($instance);
     expect(VolumeUnitEnum::GRAMS->value)->toEqual('grams');
 });
 
@@ -28,21 +31,24 @@ it('can get the label', function () {
         ->and(VolumeUnitWithoutExtrasEnum::labelFor(VolumeUnitWithoutExtrasEnum::GRAMS, 2))->toEqual('g');
 });
 
-it('can get the metadata', function () {
-    expect(VolumeUnitWithoutExtrasEnum::GRAMS->toArray())->toMatchArray([
-        'meta' => [],
-    ])
-        ->and(VolumeUnitEnum::GRAMS->toArray())->toMatchArray([
-            'meta' => [
-                'background_color' => 'bg-red-100',
-                'text_color' => 'text-red-800',
-            ],
-        ]);
+it('can get the metadata array and collection', function () {
+    $empty = ['meta' => []];
+    $expected = [
+        'meta' => [
+            'background_color' => 'bg-red-100',
+            'text_color' => 'text-red-800',
+        ],
+    ];
 
+    expect(VolumeUnitWithoutExtrasEnum::GRAMS->toArray())->toMatchArray($empty)
+        ->and(VolumeUnitEnum::GRAMS->toArray())->toMatchArray($expected);
+
+    expect(VolumeUnitWithoutExtrasEnum::GRAMS->toCollection())->toMatchArray($empty)
+        ->and(VolumeUnitEnum::GRAMS->toCollection())->toMatchArray($expected);
 });
 
-it('can list all options', function () {
-    expect(VolumeUnitEnum::options())->toEqual([
+it('can list all options as array and collection', function () {
+    $expected = [
         [
             'name' => 'MILLIGRAMS',
             'value' => 'milligrams',
@@ -79,47 +85,57 @@ it('can list all options', function () {
                 'text_color' => 'text-gray-800',
             ],
         ],
-    ]);
+    ];
+    expect(VolumeUnitEnum::options())->toMatchArray($expected);
+    expect(VolumeUnitEnum::optionsC())->toMatchArray($expected);
 });
 
-it('can get the names', function () {
-    expect(VolumeUnitEnum::names())->toEqual([
+it('can get the names as array and collection', function () {
+    $expected = [
         'MILLIGRAMS',
         'GRAMS',
         'KILOGRAMS',
         'TONNE',
-    ]);
+    ];
+    expect(VolumeUnitEnum::names())->toMatchArray($expected);
+    expect(VolumeUnitEnum::namesC())->toMatchArray($expected);
 });
 
-it('can get the values', function () {
-    expect(VolumeUnitEnum::values())->toEqual([
+it('can get the values as array and collection', function () {
+    $expected = [
         'milligrams',
         'grams',
         'kilograms',
         'tonne',
-    ]);
+    ];
+    expect(VolumeUnitEnum::values())->toMatchArray($expected);
+    expect(VolumeUnitEnum::valuesC())->toMatchArray($expected);
 });
 
-it('can get the labels', function () {
-    expect(VolumeUnitEnum::labels())->toEqual([
+it('can get the labels as array and collection', function () {
+    $expected = [
         '1 milligram',
         '1 gram',
         '1 kilogram',
         '1 tonne',
-    ]);
+    ];
+    expect(VolumeUnitEnum::labels())->toMatchArray($expected);
+    expect(VolumeUnitEnum::labelsC())->toMatchArray($expected);
 });
 
-it('can get the value => label map', function () {
-    expect(VolumeUnitEnum::map())->toEqual([
+it('can get the value => label dictionary as array and collection', function () {
+    $expected = [
         'milligrams' => '1 milligram',
         'grams' => '1 gram',
         'kilograms' => '1 kilogram',
         'tonne' => '1 tonne',
-    ]);
+    ];
+    expect(VolumeUnitEnum::dict())->toMatchArray($expected);
+    expect(VolumeUnitEnum::dictC())->toMatchArray($expected);
 });
 
-it('can convert a single value to an array', function () {
-    expect(VolumeUnitEnum::MILLIGRAMS->toArray())->toEqual([
+it('can convert a single value to an array and collection', function () {
+    $expected = [
         'name' => 'MILLIGRAMS',
         'value' => 'milligrams',
         'label' => '1 milligram',
@@ -127,7 +143,9 @@ it('can convert a single value to an array', function () {
             'background_color' => 'bg-green-100',
             'text_color' => 'text-green-800',
         ],
-    ]);
+    ];
+    expect(VolumeUnitEnum::MILLIGRAMS->toArray())->toMatchArray($expected);
+    expect(VolumeUnitEnum::MILLIGRAMS->toCollection())->toMatchArray($expected);
 });
 
 it('will return the label if toHtml it called', function () {
@@ -162,16 +180,17 @@ it('can compare enums', function () {
 });
 
 it('can negative compare enums', function () {
+    // isNot methods
     expect(VolumeUnitEnum::MILLIGRAMS->isNot(VolumeUnitEnum::MILLIGRAMS))->toBeFalse()
         ->and(VolumeUnitEnum::MILLIGRAMS->isNot(VolumeUnitEnum::GRAMS))->toBeTrue()
         ->and(VolumeUnitEnum::MILLIGRAMS->isNot('milligrams'))->toBeFalse()
         ->and(VolumeUnitEnum::MILLIGRAMS->isNot('grams'))->toBeTrue()
-        //
+        // isNotA methods
         ->and(VolumeUnitEnum::MILLIGRAMS->isNotA(VolumeUnitEnum::MILLIGRAMS))->toBeFalse()
         ->and(VolumeUnitEnum::MILLIGRAMS->isNotA(VolumeUnitEnum::GRAMS))->toBeTrue()
         ->and(VolumeUnitEnum::MILLIGRAMS->isNotA('milligrams'))->toBeFalse()
         ->and(VolumeUnitEnum::MILLIGRAMS->isNotA('grams'))->toBeTrue()
-        //
+        // isNotAn methods
         ->and(VolumeUnitEnum::MILLIGRAMS->isNotAn(VolumeUnitEnum::MILLIGRAMS))->toBeFalse()
         ->and(VolumeUnitEnum::MILLIGRAMS->isNotAn(VolumeUnitEnum::GRAMS))->toBeTrue()
         ->and(VolumeUnitEnum::MILLIGRAMS->isNotAn('milligrams'))->toBeFalse()
@@ -183,11 +202,16 @@ it('can negative compare enums', function () {
         ->and(VolumeUnitEnum::MILLIGRAMS->isNotAny(['grams', 'tonne']))->toBeTrue();
 });
 
-it('throws an exception when comparing against an invalid value', function () {
-    expect(fn () => VolumeUnitEnum::MILLIGRAMS->is('invalid'))
-        ->toThrow('"invalid" is not a valid backing value for enum Workbench\App\Enums\VolumeUnitEnum');
-});
-
 it('can get the validation rule', function () {
     expect(VolumeUnitEnum::rule())->toBeInstanceOf(Enum::class);
+    expect((fn () => $this->only)->call(VolumeUnitEnum::rule()))->toMatchArray(['milligrams', 'grams', 'kilograms', 'tonne']);
+    expect((fn () => $this->only)->call(VolumeUnitEnum::rule(exclude: VolumeUnitEnum::TONNE)))->toMatchArray(['milligrams', 'grams', 'kilograms']);
 });
+
+it('doesn\'t throw an exception when comparing against an invalid value', function () {
+    expect(VolumeUnitEnum::MILLIGRAMS->is('not-an-enum-value'))->toBe(false);
+});
+
+it('does throw an exception when not implementing the EnumPlus interface', function () {
+    EnumWithoutInterface::values();
+})->throws(RuntimeException::class);

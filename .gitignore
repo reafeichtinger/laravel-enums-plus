@@ -1,7 +1,9 @@
+
 .idea
 .phpunit.cache
 .phpunit.result.cache
 /workbench/app/Enums/*
+!/workbench/app/Enums/EnumWithoutInterface.php
 !/workbench/app/Enums/VolumeUnitEnum.php
 !/workbench/app/Enums/VolumeUnitWithoutExtrasEnum.php
 build
