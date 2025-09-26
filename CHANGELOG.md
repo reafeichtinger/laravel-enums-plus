@@ -2,6 +2,18 @@
 
 All notable changes to `laravel-enums-plus` will be documented in this file.
 
+## v2.7.0 - 2025-09-26
+
+### What's Changed
+
+* Initial release as Laravel Enums Plus.
+* Add support for dynamic translations directly in the enum.
+* Add support for pluralization and placeholders in all translations.
+
+### New Contributors
+
+* @reafeichtinger made their first contribution in https://github.com/reafeichtinger/laravel-enums-plus/commit/c6ad723bee4f9472fbbcb20bcd6ae09c3f2cb9d3
+
 ## v2.6.1 - 2025-03-05
 
 ### What's Changed

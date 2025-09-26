@@ -1,6 +1,7 @@
 {
     "name": "reafeichtinger/laravel-enums-plus",
     "description": "Supercharge your PHP8 enums with powers like localization support and fluent comparison methods.",
+    "version": "2.7.0",
     "keywords": [
         "webfox",
         "rea",
