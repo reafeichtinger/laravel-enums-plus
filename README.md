@@ -170,6 +170,7 @@ Returns an array of all enum values with their labels and metadata.
 
 ```php
 VolumeUnitEnum::options();
+VolumeUnitEnum::optionsC(); // For collection
 ```
 
 returns
@@ -206,6 +207,7 @@ Returns an array of all enum values.
 
 ```php
 VolumeUnitEnum::names();
+VolumeUnitEnum::namesC(); // For collection
 ```
 
 returns
@@ -227,6 +229,7 @@ Returns an array of all enum values.
 
 ```php
 VolumeUnitEnum::values();
+VolumeUnitEnum::valuesC(); // For collection
 ```
 
 returns
@@ -248,6 +251,7 @@ Returns an array of all enum labels.
 
 ```php
 VolumeUnitEnum::labels();
+VolumeUnitEnum::labelsC(); // For collection
 ```
 
 returns
@@ -261,14 +265,15 @@ returns
 ]
 ```
 
-### map
+### dict
 
 Returns an array of all enum values mapping to their label.
 
 #### Usage
 
 ```php
-VolumeUnitEnum::map();
+VolumeUnitEnum::dict();
+VolumeUnitEnum::dictC(); // For collection
 ```
 
 returns
@@ -282,7 +287,7 @@ returns
 ]
 ```
 
-### toArray
+### toArray & toCollection
 
 Returns an array of a single enum value with its label and metadata.
 
@@ -290,6 +295,7 @@ Returns an array of a single enum value with its label and metadata.
 
 ```php
 VolumeUnitEnum::MILLIGRAMS->toArray();
+VolumeUnitEnum::MILLIGRAMS->toCollection(); // For collection
 ```
 
 returns
@@ -439,7 +445,7 @@ Please see [CHANGELOG](CHANGELOG.md) for more information on what has changed re
 
 ## Contributing
 
-We welcome all contributors to the project.
+This project was forked from version v2.6.1 of the foxbytehq/laravel-backed-enums repository, you might want to contribute to or use the base rather than the heavily cusomized version from me.
 
 ## License
 

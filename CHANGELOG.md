@@ -2,6 +2,15 @@
 
 All notable changes to `laravel-enums-plus` will be documented in this file.
 
+## v3.0.0 - 2025-09-26
+
+### What's Changed
+
+* [BREAKING] Rename map() to dict() for clarity.
+* Add methods to enable working with Collections. E. g. Additionally to the values() method which returns an array, there is now a valuesC() method that returrns a Collection.
+* Fix exception when not implementing interface.
+* Improve test coverage.
+
 ## v2.7.0 - 2025-09-26
 
 ### What's Changed
