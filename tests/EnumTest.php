@@ -1,5 +1,6 @@
 <?php
 
+use Illuminate\Support\Facades\Config;
 use Illuminate\Validation\Rules\Enum;
 use Workbench\App\Enums\EnumWithoutInterface;
 use Workbench\App\Enums\VolumeUnitEnum;
@@ -123,6 +124,18 @@ it('can get the labels as array and collection', function () {
     expect(VolumeUnitEnum::labelsC())->toMatchArray($expected);
 });
 
+it('can get the labels with custom translation path', function () {
+    Config::set('enums-plus.translations', 'custom/enums');
+    $expected = [
+        'custom mg',
+        'custom g',
+        'custom kg',
+        'custom t',
+    ];
+    expect(VolumeUnitWithoutExtrasEnum::labels())->toMatchArray($expected);
+    expect(VolumeUnitWithoutExtrasEnum::labelsC())->toMatchArray($expected);
+});
+
 it('can get the value => label dictionary as array and collection', function () {
     $expected = [
         'milligrams' => '1 milligram',
@@ -215,3 +228,133 @@ it('doesn\'t throw an exception when comparing against an invalid value', functi
 it('does throw an exception when not implementing the EnumPlus interface', function () {
     EnumWithoutInterface::values();
 })->throws(RuntimeException::class);
+
+it('can get the seletion array', function () {
+    $expected = [
+        ['value' => 'milligrams', 'label' => '1 milligram'],
+        ['value' => 'grams', 'label' => '1 gram'],
+        ['value' => 'kilograms', 'label' => '1 kilogram'],
+        ['value' => 'tonne', 'label' => '1 tonne'],
+    ];
+    expect(VolumeUnitEnum::selection())->toMatchArray($expected);
+    expect(VolumeUnitEnum::selectionC())->toMatchArray($expected);
+});
+
+it('can get the seletion array with a custom string column', function () {
+    $expected = [
+        ['value' => 'milligrams', 'label' => '1 milligram', 'name' => 'MILLIGRAMS'],
+        ['value' => 'grams', 'label' => '1 gram', 'name' => 'GRAMS'],
+        ['value' => 'kilograms', 'label' => '1 kilogram', 'name' => 'KILOGRAMS'],
+        ['value' => 'tonne', 'label' => '1 tonne', 'name' => 'TONNE'],
+    ];
+    expect(VolumeUnitEnum::selection(name: 'name'))->toMatchArray($expected);
+    expect(VolumeUnitEnum::selectionC(name: 'name'))->toMatchArray($expected);
+});
+
+it('can get the seletion array with a custom closure column', function () {
+    $expected = [
+        ['value' => 'milligrams', 'label' => '1 milligram', 'name' => 'MILLIGRAMS_TEST'],
+        ['value' => 'grams', 'label' => '1 gram', 'name' => 'GRAMS_TEST'],
+        ['value' => 'kilograms', 'label' => '1 kilogram', 'name' => 'KILOGRAMS_TEST'],
+        ['value' => 'tonne', 'label' => '1 tonne', 'name' => 'TONNE_TEST'],
+    ];
+    expect(VolumeUnitEnum::selection(name: fn ($case) => $case->name . '_TEST'))->toMatchArray($expected);
+    expect(VolumeUnitEnum::selectionC(name: fn ($case) => $case->name . '_TEST'))->toMatchArray($expected);
+});
+
+it('can overwrite a default column', function () {
+    $expected = [
+        ['value' => 'milligrams', 'label' => '2 milligrams'],
+        ['value' => 'grams', 'label' => '2 grams'],
+        ['value' => 'kilograms', 'label' => '2 kilograms'],
+        ['value' => 'tonne', 'label' => '2 tonnes'],
+    ];
+    expect(VolumeUnitEnum::selection(label: fn ($case) => $case->label(2)))->toMatchArray($expected);
+    expect(VolumeUnitEnum::selectionC(label: fn ($case) => $case->label(2)))->toMatchArray($expected);
+});
+
+it('can mark values as selected', function () {
+    $expected = [
+        ['value' => 'milligrams', 'label' => '1 milligram', 'selected' => true],
+        ['value' => 'grams', 'label' => '1 gram'],
+        ['value' => 'kilograms', 'label' => '1 kilogram'],
+        ['value' => 'tonne', 'label' => '1 tonne'],
+    ];
+
+    // Single values
+    expect(VolumeUnitEnum::selection(selected: VolumeUnitEnum::MILLIGRAMS))->toMatchArray($expected);
+    expect(VolumeUnitEnum::selectionC(selected: VolumeUnitEnum::MILLIGRAMS))->toMatchArray($expected);
+
+    expect(VolumeUnitEnum::selection(selected: VolumeUnitEnum::MILLIGRAMS->value))->toMatchArray($expected);
+    expect(VolumeUnitEnum::selectionC(selected: VolumeUnitEnum::MILLIGRAMS->value))->toMatchArray($expected);
+
+    // Multiple values
+    $expected[2]['selected'] = true;
+    expect(VolumeUnitEnum::selection(selected: [VolumeUnitEnum::MILLIGRAMS, VolumeUnitEnum::KILOGRAMS]))->toMatchArray($expected);
+    expect(VolumeUnitEnum::selectionC(selected: [VolumeUnitEnum::MILLIGRAMS, VolumeUnitEnum::KILOGRAMS]))->toMatchArray($expected);
+
+    expect(VolumeUnitEnum::selection(selected: [VolumeUnitEnum::MILLIGRAMS->value, VolumeUnitEnum::KILOGRAMS->value]))->toMatchArray($expected);
+    expect(VolumeUnitEnum::selectionC(selected: [VolumeUnitEnum::MILLIGRAMS->value, VolumeUnitEnum::KILOGRAMS->value]))->toMatchArray($expected);
+
+    expect(VolumeUnitEnum::selection(selected: [VolumeUnitEnum::MILLIGRAMS->value, VolumeUnitEnum::KILOGRAMS]))->toMatchArray($expected);
+    expect(VolumeUnitEnum::selectionC(selected: [VolumeUnitEnum::MILLIGRAMS->value, VolumeUnitEnum::KILOGRAMS]))->toMatchArray($expected);
+});
+
+it('can get the seletion array with custom config values', function () {
+    Config::set('enums-plus.columns.value', 'id');
+    Config::set('enums-plus.columns.label', 'name');
+    Config::set('enums-plus.columns.selected', 'checked');
+    $expected = [
+        ['id' => 'milligrams', 'name' => '1 milligram', 'checked' => true],
+        ['id' => 'grams', 'name' => '1 gram'],
+        ['id' => 'kilograms', 'name' => '1 kilogram'],
+        ['id' => 'tonne', 'name' => '1 tonne'],
+    ];
+    expect(VolumeUnitEnum::selection(VolumeUnitEnum::MILLIGRAMS))->toMatchArray($expected);
+    expect(VolumeUnitEnum::selectionC(VolumeUnitEnum::MILLIGRAMS))->toMatchArray($expected);
+});
+
+it('can overwrite the default translation', function () {
+    // Custom translation path
+    $expected = [
+        ['value' => 'milligrams', 'label' => 'custom/translation.path.milligrams'],
+        ['value' => 'grams', 'label' => 'custom/translation.path.grams'],
+        ['value' => 'kilograms', 'label' => 'custom/translation.path.kilograms'],
+        ['value' => 'tonne', 'label' => 'custom/translation.path.tonne'],
+    ];
+    expect(VolumeUnitEnum::selection(translation: 'custom/translation.path'))->toMatchArray($expected);
+    expect(VolumeUnitEnum::selectionC(translation: 'custom/translation.path'))->toMatchArray($expected);
+
+    // Custom translation closure
+    $expected = [
+        ['value' => 'milligrams', 'label' => '99 milligrams'],
+        ['value' => 'grams', 'label' => '99 grams'],
+        ['value' => 'kilograms', 'label' => '99 kilograms'],
+        ['value' => 'tonne', 'label' => '99 tonnes'],
+    ];
+    expect(VolumeUnitEnum::selection(translation: fn ($case) => $case->label(99)))->toMatchArray($expected);
+    expect(VolumeUnitEnum::selectionC(translation: fn ($case) => $case->label(99)))->toMatchArray($expected);
+});
+
+it('can exclude enum cases', function () {
+    $expected = [
+        ['value' => 'milligrams', 'label' => '1 milligram'],
+        ['value' => 'kilograms', 'label' => '1 kilogram'],
+        ['value' => 'tonne', 'label' => '1 tonne'],
+    ];
+    expect(VolumeUnitEnum::selection(exclude: VolumeUnitEnum::GRAMS))->toMatchArray($expected);
+    expect(VolumeUnitEnum::selectionC(exclude: VolumeUnitEnum::GRAMS))->toMatchArray($expected);
+
+    expect(VolumeUnitEnum::selection(exclude: VolumeUnitEnum::GRAMS->value))->toMatchArray($expected);
+    expect(VolumeUnitEnum::selectionC(exclude: VolumeUnitEnum::GRAMS->value))->toMatchArray($expected);
+
+    $expected = [
+        ['value' => 'milligrams', 'label' => '1 milligram'],
+        ['value' => 'kilograms', 'label' => '1 kilogram'],
+    ];
+    expect(VolumeUnitEnum::selection(exclude: [VolumeUnitEnum::GRAMS, VolumeUnitEnum::TONNE]))->toMatchArray($expected);
+    expect(VolumeUnitEnum::selectionC(exclude: [VolumeUnitEnum::GRAMS, VolumeUnitEnum::TONNE]))->toMatchArray($expected);
+
+    expect(VolumeUnitEnum::selection(exclude: [VolumeUnitEnum::GRAMS->value, VolumeUnitEnum::TONNE->value]))->toMatchArray($expected);
+    expect(VolumeUnitEnum::selectionC(exclude: [VolumeUnitEnum::GRAMS->value, VolumeUnitEnum::TONNE->value]))->toMatchArray($expected);
+});

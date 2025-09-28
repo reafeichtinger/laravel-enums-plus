@@ -4,9 +4,12 @@ namespace Rea\LaravelEnumsPlus;
 
 use const JSON_ERROR_NONE;
 
+use Closure;
 use Countable;
 use Illuminate\Database\Eloquent\JsonEncodingException;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Str;
 use Illuminate\Validation\Rules\Enum as EnumValidationRule;
 use RuntimeException;
 
@@ -151,7 +154,7 @@ trait IsEnumPlus
         // Fallback to translation keys
         $langKey = sprintf(
             '%s.%s.%s',
-            'enums',
+            config('enums-plus.translations', 'enums'),
             static::class,
             $value->value
         );
@@ -167,6 +170,61 @@ trait IsEnumPlus
         static::ensureImplementsInterface();
 
         return new EnumValidationRule(static::class)->only(static::values($exclude));
+    }
+
+    /**
+     * Parse this enums values into a valid format for select components, neatly wrapped in a Collection.
+     *
+     * @param  null|string|self|array|Collection  $selected  The currently selected case(s).
+     * @param  null|string|self|array|Collection  $exclude  What enum case(s) should not be included.
+     * @param  null|string|Closure  $translation  When null the label() method is used. When a string, it uses the string value as a base translation path. When a closure, the result of the closure will be used.
+     * @param  string[]|Closure[]  $columns  Any additional columns to add to the result. Strings can be method or property names on the enum, closures will be called and the return value is used.
+     */
+    public static function selectionC(null|string|self|array|Collection $selected = null, null|string|self|array|Collection $exclude = null, null|string|Closure $translation = null, string|Closure ...$columns): Collection
+    {
+        return static::casesC($exclude)->map(function (self $case) use ($selected, $translation, $columns) {
+
+            // Build the actual label
+            $l = $translation instanceof Closure ? $translation($case) : (is_string($translation) ? trans_choice(Str::finish(($translation), $translation == '' ? '' : '.') . $case->value, 1) : null);
+            $l = $l ?? $case->label();
+
+            // Determine if the case is selected
+            $s = in_array($case->value, array_map(fn (self|string $case) => $case instanceof self ? $case->value : $case, Arr::wrap($selected)));
+
+            // Prepare the result
+            $result = [
+                config('enums-plus.columns.value', 'value') => $case->value,
+                config('enums-plus.columns.label', 'label') => $l,
+                config('enums-plus.columns.selected', 'selected') => $s ? true : null,
+            ];
+
+            // Add additional columns if given
+            foreach ($columns ?? [] as $key => $value) {
+                // Call the closure if given
+                if ($value instanceof Closure) {
+                    $result[$key] = $value($case);
+                } // Try calling method with the given name or get property value
+                elseif (is_string($value)) {
+                    $result[$key] = method_exists($case, $value) ? $case->{$value}() : ($case->$value ?? null);
+                }
+            }
+
+            // Remove actual null values and empty strings
+            return array_filter($result, fn ($e) => $e !== null && (!is_string($e) || (is_string($e) && trim($e) !== '')));
+        })->values();
+    }
+
+    /**
+     * Parse this enums values into a valid format for select components.
+     *
+     * @param  null|string|self|array|Collection  $selected  The currently selected case(s).
+     * @param  null|string|self|array|Collection  $exclude  What enum case(s) should not be included.
+     * @param  null|string|Closure  $translation  When null the label() method is used. When a string, it uses the string value as a base translation path. When a closure, the result of the closure will be used.
+     * @param  string[]|Closure[]  $columns  Any additional columns to add to the result. Strings can be method or property names on the enum, closures will be called and the return value is used.
+     */
+    public static function selection(null|string|self|array|Collection $selected = null, null|string|self|array|Collection $exclude = null, null|string|Closure $translation = null, string|Closure ...$columns): array
+    {
+        return static::selectionC($selected, $exclude, $translation, ...$columns)->toArray();
     }
 
     #endregion static

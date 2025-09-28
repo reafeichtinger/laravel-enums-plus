@@ -2,6 +2,13 @@
 
 All notable changes to `laravel-enums-plus` will be documented in this file.
 
+## v3.1.0 - 2025-09-28
+
+### What's Changed
+
+* Allow base translation path to be set via config.
+* Add highly customizable `selection()` and `selectionC()` methods.
+
 ## v3.0.1 - 2025-09-26
 
 ### What's Changed
