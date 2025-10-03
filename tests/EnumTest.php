@@ -14,22 +14,32 @@ it('can create an enum', function () {
 
 it('can get the label', function () {
     // Dynamic translation from enum
-    expect(VolumeUnitEnum::GRAMS->label())->toEqual('1 gram')
-        ->and(VolumeUnitEnum::labelFor(VolumeUnitEnum::GRAMS))->toEqual('1 gram');
+    expect(VolumeUnitEnum::GRAMS->label())->toEqual('0 grams of butter')
+        ->and(VolumeUnitEnum::GRAMS->trans())->toEqual('0 grams of butter')
+        ->and(VolumeUnitEnum::labelFor(VolumeUnitEnum::GRAMS))->toEqual('0 grams of butter')
+        ->and(VolumeUnitEnum::transFor(VolumeUnitEnum::GRAMS))->toEqual('0 grams of butter');
 
-    expect(VolumeUnitEnum::GRAMS->label(2))->toEqual('2 grams')
-        ->and(VolumeUnitEnum::labelFor(VolumeUnitEnum::GRAMS, 2))->toEqual('2 grams');
+    expect(VolumeUnitEnum::GRAMS->label(2))->toEqual('2 grams of butter')
+        ->and(VolumeUnitEnum::GRAMS->label(2))->toEqual('2 grams of butter')
+        ->and(VolumeUnitEnum::labelFor(VolumeUnitEnum::GRAMS, 2))->toEqual('2 grams of butter')
+        ->and(VolumeUnitEnum::transFor(VolumeUnitEnum::GRAMS, 2))->toEqual('2 grams of butter');
 
     $count = rand(2, 999);
-    expect(VolumeUnitEnum::GRAMS->label($count, ['count' => "Weight = $count"]))->toEqual("Weight = $count grams")
-        ->and(VolumeUnitEnum::labelFor(VolumeUnitEnum::GRAMS, $count, ['count' => "Weight = $count"]))->toEqual("Weight = $count grams");
+    expect(VolumeUnitEnum::GRAMS->label($count, ['count' => "Weight = $count", 'of' => 'ketchup']))->toEqual("Weight = $count grams of ketchup")
+        ->and(VolumeUnitEnum::GRAMS->trans($count, ['count' => "Weight = $count", 'of' => 'ketchup']))->toEqual("Weight = $count grams of ketchup")
+        ->and(VolumeUnitEnum::labelFor(VolumeUnitEnum::GRAMS, $count, ['count' => "Weight = $count", 'of' => 'ketchup']))->toEqual("Weight = $count grams of ketchup")
+        ->and(VolumeUnitEnum::transFor(VolumeUnitEnum::GRAMS, $count, ['count' => "Weight = $count", 'of' => 'ketchup']))->toEqual("Weight = $count grams of ketchup");
 
     // Static translation from lang/en
     expect(VolumeUnitWithoutExtrasEnum::GRAMS->label())->toEqual('g')
-        ->and(VolumeUnitWithoutExtrasEnum::labelFor(VolumeUnitWithoutExtrasEnum::GRAMS))->toEqual('g');
+        ->and(VolumeUnitWithoutExtrasEnum::GRAMS->trans())->toEqual('g')
+        ->and(VolumeUnitWithoutExtrasEnum::labelFor(VolumeUnitWithoutExtrasEnum::GRAMS))->toEqual('g')
+        ->and(VolumeUnitWithoutExtrasEnum::transFor(VolumeUnitWithoutExtrasEnum::GRAMS))->toEqual('g');
 
     expect(VolumeUnitWithoutExtrasEnum::GRAMS->label(2))->toEqual('g')
-        ->and(VolumeUnitWithoutExtrasEnum::labelFor(VolumeUnitWithoutExtrasEnum::GRAMS, 2))->toEqual('g');
+        ->and(VolumeUnitWithoutExtrasEnum::GRAMS->trans(2))->toEqual('g')
+        ->and(VolumeUnitWithoutExtrasEnum::labelFor(VolumeUnitWithoutExtrasEnum::GRAMS, 2))->toEqual('g')
+        ->and(VolumeUnitWithoutExtrasEnum::transFor(VolumeUnitWithoutExtrasEnum::GRAMS, 2))->toEqual('g');
 });
 
 it('can get the metadata array and collection', function () {
@@ -53,37 +63,49 @@ it('can list all options as array and collection', function () {
         [
             'name' => 'MILLIGRAMS',
             'value' => 'milligrams',
-            'label' => '1 milligram',
+            'label' => '0 milligrams of butter',
             'meta' => [
                 'background_color' => 'bg-green-100',
                 'text_color' => 'text-green-800',
+            ],
+            'alias' => [
+                'mg',
             ],
         ],
         [
             'name' => 'GRAMS',
             'value' => 'grams',
-            'label' => '1 gram',
+            'label' => '0 grams of butter',
             'meta' => [
                 'background_color' => 'bg-red-100',
                 'text_color' => 'text-red-800',
+            ],
+            'alias' => [
+                'g',
             ],
         ],
         [
             'name' => 'KILOGRAMS',
             'value' => 'kilograms',
-            'label' => '1 kilogram',
+            'label' => '0 kilograms of butter',
             'meta' => [
                 'background_color' => 'bg-gray-100',
                 'text_color' => 'text-gray-800',
+            ],
+            'alias' => [
+                'kg',
             ],
         ],
         [
             'name' => 'TONNE',
             'value' => 'tonne',
-            'label' => '1 tonne',
+            'label' => '0 tonnes of butter',
             'meta' => [
                 'background_color' => 'bg-gray-100',
                 'text_color' => 'text-gray-800',
+            ],
+            'alias' => [
+                't',
             ],
         ],
     ];
@@ -115,10 +137,10 @@ it('can get the values as array and collection', function () {
 
 it('can get the labels as array and collection', function () {
     $expected = [
-        '1 milligram',
-        '1 gram',
-        '1 kilogram',
-        '1 tonne',
+        '0 milligrams of butter',
+        '0 grams of butter',
+        '0 kilograms of butter',
+        '0 tonnes of butter',
     ];
     expect(VolumeUnitEnum::labels())->toMatchArray($expected);
     expect(VolumeUnitEnum::labelsC())->toMatchArray($expected);
@@ -138,10 +160,10 @@ it('can get the labels with custom translation path', function () {
 
 it('can get the value => label dictionary as array and collection', function () {
     $expected = [
-        'milligrams' => '1 milligram',
-        'grams' => '1 gram',
-        'kilograms' => '1 kilogram',
-        'tonne' => '1 tonne',
+        'milligrams' => '0 milligrams of butter',
+        'grams' => '0 grams of butter',
+        'kilograms' => '0 kilograms of butter',
+        'tonne' => '0 tonnes of butter',
     ];
     expect(VolumeUnitEnum::dict())->toMatchArray($expected);
     expect(VolumeUnitEnum::dictC())->toMatchArray($expected);
@@ -151,7 +173,7 @@ it('can convert a single value to an array and collection', function () {
     $expected = [
         'name' => 'MILLIGRAMS',
         'value' => 'milligrams',
-        'label' => '1 milligram',
+        'label' => '0 milligrams of butter',
         'meta' => [
             'background_color' => 'bg-green-100',
             'text_color' => 'text-green-800',
@@ -162,11 +184,11 @@ it('can convert a single value to an array and collection', function () {
 });
 
 it('will return the label if toHtml it called', function () {
-    expect(VolumeUnitEnum::MILLIGRAMS->toHtml())->toEqual('1 milligram');
+    expect(VolumeUnitEnum::MILLIGRAMS->toHtml())->toEqual('0 milligrams of butter');
 });
 
 it('will return the json string format of toArray if toJson is called', function () {
-    expect(VolumeUnitEnum::MILLIGRAMS->toJson())->toEqual('{"name":"MILLIGRAMS","value":"milligrams","label":"1 milligram","meta":{"background_color":"bg-green-100","text_color":"text-green-800"}}');
+    expect(VolumeUnitEnum::MILLIGRAMS->toJson())->toEqual('{"name":"MILLIGRAMS","value":"milligrams","label":"0 milligrams of butter","meta":{"background_color":"bg-green-100","text_color":"text-green-800"},"alias":["mg"]}');
 });
 
 it('can compare enums', function () {
@@ -231,73 +253,73 @@ it('does throw an exception when not implementing the EnumPlus interface', funct
 
 it('can get the seletion array', function () {
     $expected = [
-        ['value' => 'milligrams', 'label' => '1 milligram'],
-        ['value' => 'grams', 'label' => '1 gram'],
-        ['value' => 'kilograms', 'label' => '1 kilogram'],
-        ['value' => 'tonne', 'label' => '1 tonne'],
+        ['value' => 'milligrams', 'label' => '0 milligrams of butter'],
+        ['value' => 'grams', 'label' => '0 grams of butter'],
+        ['value' => 'kilograms', 'label' => '0 kilograms of butter'],
+        ['value' => 'tonne', 'label' => '0 tonnes of butter'],
     ];
-    expect(VolumeUnitEnum::selection())->toMatchArray($expected);
-    expect(VolumeUnitEnum::selectionC())->toMatchArray($expected);
+    expect(VolumeUnitEnum::select())->toMatchArray($expected);
+    expect(VolumeUnitEnum::selectC())->toMatchArray($expected);
 });
 
 it('can get the seletion array with a custom string column', function () {
     $expected = [
-        ['value' => 'milligrams', 'label' => '1 milligram', 'name' => 'MILLIGRAMS'],
-        ['value' => 'grams', 'label' => '1 gram', 'name' => 'GRAMS'],
-        ['value' => 'kilograms', 'label' => '1 kilogram', 'name' => 'KILOGRAMS'],
-        ['value' => 'tonne', 'label' => '1 tonne', 'name' => 'TONNE'],
+        ['value' => 'milligrams', 'label' => '0 milligrams of butter', 'name' => 'MILLIGRAMS'],
+        ['value' => 'grams', 'label' => '0 grams of butter', 'name' => 'GRAMS'],
+        ['value' => 'kilograms', 'label' => '0 kilograms of butter', 'name' => 'KILOGRAMS'],
+        ['value' => 'tonne', 'label' => '0 tonnes of butter', 'name' => 'TONNE'],
     ];
-    expect(VolumeUnitEnum::selection(name: 'name'))->toMatchArray($expected);
-    expect(VolumeUnitEnum::selectionC(name: 'name'))->toMatchArray($expected);
+    expect(VolumeUnitEnum::select(name: 'name'))->toMatchArray($expected);
+    expect(VolumeUnitEnum::selectC(name: 'name'))->toMatchArray($expected);
 });
 
 it('can get the seletion array with a custom closure column', function () {
     $expected = [
-        ['value' => 'milligrams', 'label' => '1 milligram', 'name' => 'MILLIGRAMS_TEST'],
-        ['value' => 'grams', 'label' => '1 gram', 'name' => 'GRAMS_TEST'],
-        ['value' => 'kilograms', 'label' => '1 kilogram', 'name' => 'KILOGRAMS_TEST'],
-        ['value' => 'tonne', 'label' => '1 tonne', 'name' => 'TONNE_TEST'],
+        ['value' => 'milligrams', 'label' => '0 milligrams of butter', 'name' => 'MILLIGRAMS_TEST'],
+        ['value' => 'grams', 'label' => '0 grams of butter', 'name' => 'GRAMS_TEST'],
+        ['value' => 'kilograms', 'label' => '0 kilograms of butter', 'name' => 'KILOGRAMS_TEST'],
+        ['value' => 'tonne', 'label' => '0 tonnes of butter', 'name' => 'TONNE_TEST'],
     ];
-    expect(VolumeUnitEnum::selection(name: fn ($case) => $case->name . '_TEST'))->toMatchArray($expected);
-    expect(VolumeUnitEnum::selectionC(name: fn ($case) => $case->name . '_TEST'))->toMatchArray($expected);
+    expect(VolumeUnitEnum::select(name: fn ($case) => $case->name . '_TEST'))->toMatchArray($expected);
+    expect(VolumeUnitEnum::selectC(name: fn ($case) => $case->name . '_TEST'))->toMatchArray($expected);
 });
 
 it('can overwrite a default column', function () {
     $expected = [
-        ['value' => 'milligrams', 'label' => '2 milligrams'],
-        ['value' => 'grams', 'label' => '2 grams'],
-        ['value' => 'kilograms', 'label' => '2 kilograms'],
-        ['value' => 'tonne', 'label' => '2 tonnes'],
+        ['value' => 'milligrams', 'label' => '2 milligrams of butter'],
+        ['value' => 'grams', 'label' => '2 grams of butter'],
+        ['value' => 'kilograms', 'label' => '2 kilograms of butter'],
+        ['value' => 'tonne', 'label' => '2 tonnes of butter'],
     ];
-    expect(VolumeUnitEnum::selection(label: fn ($case) => $case->label(2)))->toMatchArray($expected);
-    expect(VolumeUnitEnum::selectionC(label: fn ($case) => $case->label(2)))->toMatchArray($expected);
+    expect(VolumeUnitEnum::select(label: fn ($case) => $case->label(2)))->toMatchArray($expected);
+    expect(VolumeUnitEnum::selectC(label: fn ($case) => $case->label(2)))->toMatchArray($expected);
 });
 
 it('can mark values as selected', function () {
     $expected = [
-        ['value' => 'milligrams', 'label' => '1 milligram', 'selected' => true],
-        ['value' => 'grams', 'label' => '1 gram'],
-        ['value' => 'kilograms', 'label' => '1 kilogram'],
-        ['value' => 'tonne', 'label' => '1 tonne'],
+        ['value' => 'milligrams', 'label' => '0 milligrams of butter', 'selected' => true],
+        ['value' => 'grams', 'label' => '0 grams of butter'],
+        ['value' => 'kilograms', 'label' => '0 kilograms of butter'],
+        ['value' => 'tonne', 'label' => '0 tonnes of butter'],
     ];
 
     // Single values
-    expect(VolumeUnitEnum::selection(selected: VolumeUnitEnum::MILLIGRAMS))->toMatchArray($expected);
-    expect(VolumeUnitEnum::selectionC(selected: VolumeUnitEnum::MILLIGRAMS))->toMatchArray($expected);
+    expect(VolumeUnitEnum::select(selected: VolumeUnitEnum::MILLIGRAMS))->toMatchArray($expected);
+    expect(VolumeUnitEnum::selectC(selected: VolumeUnitEnum::MILLIGRAMS))->toMatchArray($expected);
 
-    expect(VolumeUnitEnum::selection(selected: VolumeUnitEnum::MILLIGRAMS->value))->toMatchArray($expected);
-    expect(VolumeUnitEnum::selectionC(selected: VolumeUnitEnum::MILLIGRAMS->value))->toMatchArray($expected);
+    expect(VolumeUnitEnum::select(selected: VolumeUnitEnum::MILLIGRAMS->value))->toMatchArray($expected);
+    expect(VolumeUnitEnum::selectC(selected: VolumeUnitEnum::MILLIGRAMS->value))->toMatchArray($expected);
 
     // Multiple values
     $expected[2]['selected'] = true;
-    expect(VolumeUnitEnum::selection(selected: [VolumeUnitEnum::MILLIGRAMS, VolumeUnitEnum::KILOGRAMS]))->toMatchArray($expected);
-    expect(VolumeUnitEnum::selectionC(selected: [VolumeUnitEnum::MILLIGRAMS, VolumeUnitEnum::KILOGRAMS]))->toMatchArray($expected);
+    expect(VolumeUnitEnum::select(selected: [VolumeUnitEnum::MILLIGRAMS, VolumeUnitEnum::KILOGRAMS]))->toMatchArray($expected);
+    expect(VolumeUnitEnum::selectC(selected: [VolumeUnitEnum::MILLIGRAMS, VolumeUnitEnum::KILOGRAMS]))->toMatchArray($expected);
 
-    expect(VolumeUnitEnum::selection(selected: [VolumeUnitEnum::MILLIGRAMS->value, VolumeUnitEnum::KILOGRAMS->value]))->toMatchArray($expected);
-    expect(VolumeUnitEnum::selectionC(selected: [VolumeUnitEnum::MILLIGRAMS->value, VolumeUnitEnum::KILOGRAMS->value]))->toMatchArray($expected);
+    expect(VolumeUnitEnum::select(selected: [VolumeUnitEnum::MILLIGRAMS->value, VolumeUnitEnum::KILOGRAMS->value]))->toMatchArray($expected);
+    expect(VolumeUnitEnum::selectC(selected: [VolumeUnitEnum::MILLIGRAMS->value, VolumeUnitEnum::KILOGRAMS->value]))->toMatchArray($expected);
 
-    expect(VolumeUnitEnum::selection(selected: [VolumeUnitEnum::MILLIGRAMS->value, VolumeUnitEnum::KILOGRAMS]))->toMatchArray($expected);
-    expect(VolumeUnitEnum::selectionC(selected: [VolumeUnitEnum::MILLIGRAMS->value, VolumeUnitEnum::KILOGRAMS]))->toMatchArray($expected);
+    expect(VolumeUnitEnum::select(selected: [VolumeUnitEnum::MILLIGRAMS->value, VolumeUnitEnum::KILOGRAMS]))->toMatchArray($expected);
+    expect(VolumeUnitEnum::selectC(selected: [VolumeUnitEnum::MILLIGRAMS->value, VolumeUnitEnum::KILOGRAMS]))->toMatchArray($expected);
 });
 
 it('can get the seletion array with custom config values', function () {
@@ -305,13 +327,13 @@ it('can get the seletion array with custom config values', function () {
     Config::set('enums-plus.columns.label', 'name');
     Config::set('enums-plus.columns.selected', 'checked');
     $expected = [
-        ['id' => 'milligrams', 'name' => '1 milligram', 'checked' => true],
-        ['id' => 'grams', 'name' => '1 gram'],
-        ['id' => 'kilograms', 'name' => '1 kilogram'],
-        ['id' => 'tonne', 'name' => '1 tonne'],
+        ['id' => 'milligrams', 'name' => '0 milligrams of butter', 'checked' => true],
+        ['id' => 'grams', 'name' => '0 grams of butter'],
+        ['id' => 'kilograms', 'name' => '0 kilograms of butter'],
+        ['id' => 'tonne', 'name' => '0 tonnes of butter'],
     ];
-    expect(VolumeUnitEnum::selection(VolumeUnitEnum::MILLIGRAMS))->toMatchArray($expected);
-    expect(VolumeUnitEnum::selectionC(VolumeUnitEnum::MILLIGRAMS))->toMatchArray($expected);
+    expect(VolumeUnitEnum::select(VolumeUnitEnum::MILLIGRAMS))->toMatchArray($expected);
+    expect(VolumeUnitEnum::selectC(VolumeUnitEnum::MILLIGRAMS))->toMatchArray($expected);
 });
 
 it('can overwrite the default translation', function () {
@@ -322,39 +344,72 @@ it('can overwrite the default translation', function () {
         ['value' => 'kilograms', 'label' => 'custom/translation.path.kilograms'],
         ['value' => 'tonne', 'label' => 'custom/translation.path.tonne'],
     ];
-    expect(VolumeUnitEnum::selection(translation: 'custom/translation.path'))->toMatchArray($expected);
-    expect(VolumeUnitEnum::selectionC(translation: 'custom/translation.path'))->toMatchArray($expected);
+    expect(VolumeUnitEnum::select(translation: 'custom/translation.path'))->toMatchArray($expected);
+    expect(VolumeUnitEnum::selectC(translation: 'custom/translation.path'))->toMatchArray($expected);
 
     // Custom translation closure
     $expected = [
-        ['value' => 'milligrams', 'label' => '99 milligrams'],
-        ['value' => 'grams', 'label' => '99 grams'],
-        ['value' => 'kilograms', 'label' => '99 kilograms'],
-        ['value' => 'tonne', 'label' => '99 tonnes'],
+        ['value' => 'milligrams', 'label' => '99 milligrams of butter'],
+        ['value' => 'grams', 'label' => '99 grams of butter'],
+        ['value' => 'kilograms', 'label' => '99 kilograms of butter'],
+        ['value' => 'tonne', 'label' => '99 tonnes of butter'],
     ];
-    expect(VolumeUnitEnum::selection(translation: fn ($case) => $case->label(99)))->toMatchArray($expected);
-    expect(VolumeUnitEnum::selectionC(translation: fn ($case) => $case->label(99)))->toMatchArray($expected);
+    expect(VolumeUnitEnum::select(translation: fn ($case) => $case->label(99)))->toMatchArray($expected);
+    expect(VolumeUnitEnum::selectC(translation: fn ($case) => $case->label(99)))->toMatchArray($expected);
 });
 
 it('can exclude enum cases', function () {
     $expected = [
-        ['value' => 'milligrams', 'label' => '1 milligram'],
-        ['value' => 'kilograms', 'label' => '1 kilogram'],
-        ['value' => 'tonne', 'label' => '1 tonne'],
+        ['value' => 'milligrams', 'label' => '0 milligrams of butter'],
+        ['value' => 'kilograms', 'label' => '0 kilograms of butter'],
+        ['value' => 'tonne', 'label' => '0 tonnes of butter'],
     ];
-    expect(VolumeUnitEnum::selection(exclude: VolumeUnitEnum::GRAMS))->toMatchArray($expected);
-    expect(VolumeUnitEnum::selectionC(exclude: VolumeUnitEnum::GRAMS))->toMatchArray($expected);
+    expect(VolumeUnitEnum::select(exclude: VolumeUnitEnum::GRAMS))->toMatchArray($expected);
+    expect(VolumeUnitEnum::selectC(exclude: VolumeUnitEnum::GRAMS))->toMatchArray($expected);
 
-    expect(VolumeUnitEnum::selection(exclude: VolumeUnitEnum::GRAMS->value))->toMatchArray($expected);
-    expect(VolumeUnitEnum::selectionC(exclude: VolumeUnitEnum::GRAMS->value))->toMatchArray($expected);
+    expect(VolumeUnitEnum::select(exclude: VolumeUnitEnum::GRAMS->value))->toMatchArray($expected);
+    expect(VolumeUnitEnum::selectC(exclude: VolumeUnitEnum::GRAMS->value))->toMatchArray($expected);
 
     $expected = [
-        ['value' => 'milligrams', 'label' => '1 milligram'],
-        ['value' => 'kilograms', 'label' => '1 kilogram'],
+        ['value' => 'milligrams', 'label' => '0 milligrams of butter'],
+        ['value' => 'kilograms', 'label' => '0 kilograms of butter'],
     ];
-    expect(VolumeUnitEnum::selection(exclude: [VolumeUnitEnum::GRAMS, VolumeUnitEnum::TONNE]))->toMatchArray($expected);
-    expect(VolumeUnitEnum::selectionC(exclude: [VolumeUnitEnum::GRAMS, VolumeUnitEnum::TONNE]))->toMatchArray($expected);
+    expect(VolumeUnitEnum::select(exclude: [VolumeUnitEnum::GRAMS, VolumeUnitEnum::TONNE]))->toMatchArray($expected);
+    expect(VolumeUnitEnum::selectC(exclude: [VolumeUnitEnum::GRAMS, VolumeUnitEnum::TONNE]))->toMatchArray($expected);
 
-    expect(VolumeUnitEnum::selection(exclude: [VolumeUnitEnum::GRAMS->value, VolumeUnitEnum::TONNE->value]))->toMatchArray($expected);
-    expect(VolumeUnitEnum::selectionC(exclude: [VolumeUnitEnum::GRAMS->value, VolumeUnitEnum::TONNE->value]))->toMatchArray($expected);
+    expect(VolumeUnitEnum::select(exclude: [VolumeUnitEnum::GRAMS->value, VolumeUnitEnum::TONNE->value]))->toMatchArray($expected);
+    expect(VolumeUnitEnum::selectC(exclude: [VolumeUnitEnum::GRAMS->value, VolumeUnitEnum::TONNE->value]))->toMatchArray($expected);
+});
+
+it('can get matches', function () {
+    $expected = [
+        [
+            'case' => [
+                'name' => 'TONNE',
+                'value' => 'tonne',
+                'label' => '0 tonnes of butter',
+                'meta' => [
+                    'background_color' => 'bg-gray-100',
+                    'text_color' => 'text-gray-800',
+                ],
+                'alias' => ['t'],
+            ],
+            'distance' => 2,
+        ],
+    ];
+
+    expect(VolumeUnitEnum::matches('ton'))->toMatchArray($expected);
+    expect(VolumeUnitEnum::matchesC('ton'))->toMatchArray($expected);
+});
+
+it('can parse any value to some case', function () {
+    expect(VolumeUnitEnum::parse('tonne'))->toBe(VolumeUnitEnum::TONNE);
+    expect(VolumeUnitEnum::parse('t'))->toBe(VolumeUnitEnum::TONNE);
+    expect(VolumeUnitEnum::parse('ton'))->toBe(VolumeUnitEnum::TONNE);
+    expect(VolumeUnitEnum::parse('tone'))->toBe(VolumeUnitEnum::TONNE);
+    expect(VolumeUnitEnum::parse('Gramm'))->toBe(VolumeUnitEnum::GRAMS);
+    expect(VolumeUnitEnum::parse('gr4m'))->toBe(VolumeUnitEnum::GRAMS);
+    expect(VolumeUnitEnum::parse(''))->toBe(VolumeUnitEnum::GRAMS);
+    expect(VolumeUnitEnum::parse('whatever'))->toBe(VolumeUnitEnum::TONNE);
+    expect(VolumeUnitEnum::parse('gram of'))->toBe(VolumeUnitEnum::GRAMS);
 });

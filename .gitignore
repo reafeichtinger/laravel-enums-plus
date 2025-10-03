@@ -7,7 +7,6 @@
 !/workbench/app/Enums/VolumeUnitEnum.php
 !/workbench/app/Enums/VolumeUnitWithoutExtrasEnum.php
 build
-composer.lock
 coverage
 docs
 node_modules

@@ -1,29 +1,35 @@
-![Banner Image](https://banners.beyondco.de/Laravel%20Enums%20Plus.png?theme=light&packageManager=composer+require&packageName=reafeichtinger%2Flaravel-enums-plus&pattern=architect&style=style_1&description=Supercharge+your+PHP8+enums+in+Laravel.&md=1&showWatermark=0&fontSize=125px&images=https%3A%2F%2Flaravel.com%2Fimg%2Flogomark.min.svg)
+![Banner Image](https://banners.beyondco.de/Laravel%20Enums%20Plus.png?theme=dark&packageManager=composer+require&packageName=reafeichtinger%2Flaravel-enums-plus&pattern=topography&style=style_2&description=Supercharge+your+PHP+8.1%2B+enums+in+Laravel&md=1&showWatermark=0&fontSize=100px&images=https%3A%2F%2Flaravel.com%2Fimg%2Flogomark.min.svg&heights=auto)
 
-[![Latest Version on Packagist](https://img.shields.io/packagist/v/reafeichtinger/laravel-enums-plus.svg?style=flat-square)](https://packagist.org/packages/reafeichtinger/laravel-enums-plus)
-[![Total Downloads](https://img.shields.io/packagist/dt/reafeichtinger/laravel-enums-plus.svg?style=flat-square)](https://packagist.org/packages/reafeichtinger/laravel-enums-plus)
+[![Latest Version on Packagist](https://img.shields.io/packagist/v/reafeichtinger/laravel-enums-plus.svg?style=flat)](https://packagist.org/packages/reafeichtinger/laravel-enums-plus)
+[![Total Downloads](https://img.shields.io/packagist/dt/reafeichtinger/laravel-enums-plus.svg?style=flat)](https://packagist.org/packages/reafeichtinger/laravel-enums-plus)
 
-This package supercharges your PHP8 enums with superpowers like localization support and fluent comparison methods.
+This package supercharges your PHP 8.1+ enums with superpowers like localization support and fluent comparison methods.
 
-## Installation
+# Installation
 
 ```bash
 composer require reafeichtinger/laravel-enums-plus
 ```
 
-## Usage
+## Publishing the config 
 
-### Make Command
+You might want to overwrite some default settings. You can pushlish the config for further editing with this command.
+
+```bash
+php artisan vendor:publish --tag=laravel-enums-plus-config
+```
+
+# Creating a new enum class with the `make:enum` Command
 
 Creating a new Laravel Enum is easy with the make:enum command.
 
-#### Command:
+## Command:
 
 ```Bash
-php artisan make:enum {name} --string # or --int
+php artisan make:enum-plus {name} --string # or --int
 ```
 
-#### Arguments:
+### Arguments:
 
 * `{name}`: The name of the enum class to be created (e.g., OrderStatus). The command will automatically append "Enum" to the name (e.g., OrderStatusEnum).
 * `{type?}`: The underlying data type for the enum. Can be either --int --string or if not specified it will be a pure enum.
@@ -46,12 +52,11 @@ To create a pure enum named OrderStatusEnum:
 
 ``` Bash
 php artisan make:enum OrderStatus
-
 ```
 
 This will generate an OrderStatusEnums in the `app/Enums` directory.
 
-### Upgrade your existing enums
+# Upgrading your existing enums
 
 The enum you create must implement the `EnumPlus` interface and also use the `IsEnumPlus` trait.
 The interface is required for Laravel to cast your enum correctly and the trait is what gives your enum its superpowers.
@@ -60,9 +65,9 @@ The interface is required for Laravel to cast your enum correctly and the trait 
 use Rea\LaravelEnumsPlus\EnumPlus;
 use Rea\LaravelEnumsPlus\IsEnumPlus;
 
-enum VolumeUnitEnum: string implements EnumPlus
+enum VolumeUnitEnum: string implements EnumPlus // Add this
 {
-    use IsEnumPlus;
+    use IsEnumPlus; // Add this
 
     case MILLIGRAMS = "milligrams";
     case GRAMS = "grams";
@@ -71,9 +76,60 @@ enum VolumeUnitEnum: string implements EnumPlus
 }
 ```
 
-### Enum value labels (Localization)
+# Enhance your enum class
 
-Create enums.php lang file and create labels for your enum values.
+Once you have your basic enum class you can enhance and customize it so it fits your project.
+
+## Enum value labels (Localization)
+
+All translations support pluralization as well as placeholders but in some cases you cannot specify the count or the placeholders. In order to have control over the default values in this case you may define a `defaultCount` and `defaultReplace` method.
+
+```php
+public function defaultCount(): int
+{
+    return 0; // Would be 1 by default
+}
+
+public function defaultReplace(): array
+{
+    return [
+        'of' => "butter", // Would be an empty array by default
+    ];
+}
+```
+
+### Translations directly in the enum
+
+You can define translations directly inside of the enum class by adding a `translation` method:
+
+```php
+public function translations(): array
+{
+    return [
+        'en' => [
+            self::GRAMS->value => ':count gram of :of|:count grams of :of',
+            self::MILLIGRAMS->value => ':count milligram of :of|:count milligrams of :of',
+            self::KILOGRAMS->value => ':count kilogram of :of|:count kilograms of :of',
+            self::TONNE->value => ':count tonne of :of|:count tonnes of :of',
+        ],
+        'de' => [
+            self::GRAMS->value => ':count Gram :Of|:count Gram :Of',
+            self::MILLIGRAMS->value => ':count Milligram :Of|:count Milligram :Of',
+            self::KILOGRAMS->value => ':count Kilogram :Of|:count Kilogram :Of',
+            self::TONNE->value => ':count Tonne :Of|:count Tonnen :Of',
+        ],
+    ];
+}
+```
+
+If you do not specify a `translations` method, it will fallback to the enums.php translation file.
+
+### Using laravel translations
+
+Create `enums.php` lang file and create labels for your enum values. 
+
+> **Note:**
+> The path to the enum translations can be customized via the config file.
 
 ```php
 // resources/lang/en/enums.php
@@ -88,47 +144,21 @@ return [
 ];
 ```
 
-You may then access these localized values using the `->label()` or `::labelFor()` methods.  
+You may then access these localized values using the `->label()`, `->trans()`, `::labelFor()` or `::transFor()` methods.  
 Additionally rendering the enum in a blade template will render the label.
 
 ```php
 VolumeUnitEnum::MILLIGRAMS->label(); // "mg"
+VolumeUnitEnum::MILLIGRAMS->trans(); // "mg"
 VolumeUnitEnum::labelFor(VolumeUnitEnum::TONNE); // "t"
+VolumeUnitEnum::transFor(VolumeUnitEnum::TONNE); // "t"
 // in blade
-{{ VolumeUnitEnum::KILOGRAMS }} // "kg"
+{{ VolumeUnitEnum::KILOGRAMS }} // "kg" - Uses default count and replace values
 ```
 
 If you do not specify a label in the lang file these methods will return the value assigned to the enum inside the enum file. e.g MILLIGRAMS label will be milligrams.
 
-#### Dynamic translations
-
-You can also add translations directly to the enum file. Translations support the full feature catalouge of laravel translations, meaning pluralization and placeholders.
-
-Create a `translations` method on your enum.
-
-```php
-public function translations(): array
-{
-    return [
-        'en' => [
-            self::GRAMS->value => ':count gram|:count grams',
-            self::MILLIGRAMS->value => ':count milligram|:count milligrams',
-            self::KILOGRAMS->value => ':count kilogram|:count kilograms',
-            self::TONNE->value => ':count tonne|:count tonnes',
-        ],
-        'de' => [
-            self::GRAMS->value => ':count Gram|:count Gram',
-            self::MILLIGRAMS->value => ':count Milligram|:count Milligram',
-            self::KILOGRAMS->value => ':count Kilogram|:count Kilogram',
-            self::TONNE->value => ':count Tonne|:count Tonnen',
-        ],
-    ];
-}
-```
-
-If you do not specify a `translations` method, it will fallback to the enums.php translation file.
-
-### Meta data
+## Meta data
 
 Adding metadata allows you to return additional values alongside the label and values.
 
@@ -160,13 +190,34 @@ public function withMeta(): array
 
 If you do not specify a `withMeta` method, meta will be an empty array.
 
-## Other methods
+## Alias
 
-### options
+Adding aliases allows you to match additional values to an enum case.
+
+Create a withAlias method on your enum to add them.
+
+```php
+public function withAlias(): array
+{
+    return match ($this) {
+        self::MILLIGRAMS    => ['mg'],
+        self::GRAMS         => ['g'],
+        self::KILOGRAMS     => ['kg'],
+        self::TONNE         => ['t', 'ton'],
+        default             => [],
+    };
+}
+```
+
+If you do not specify a `withAlias` method, meta will be an empty array.
+
+# Other methods
+
+## `options()`
 
 Returns an array of all enum values with their labels and metadata.
 
-#### Usage
+### Usage
 
 ```php
 VolumeUnitEnum::options();
@@ -185,6 +236,9 @@ returns
             'background_color' => 'bg-green-100',
             'text_color'       => 'text-green-800',
         ],
+        'alias' => [
+            'mg',
+        ]
     ],
     [
         'name'  => 'GRAMS',
@@ -194,16 +248,19 @@ returns
             'background_color' => 'bg-red-100',
             'text_color'       => 'text-red-800',
         ],
+        'alias' => [
+            'g',
+        ]
         ...
     ]
 ]
 ```
 
-### names
+## `names()`
 
-Returns an array of all enum values.
+Returns an array of all enum names.
 
-#### Usage
+### Usage
 
 ```php
 VolumeUnitEnum::names();
@@ -221,11 +278,11 @@ returns
 ]
 ```
 
-### values
+## `values()`
 
 Returns an array of all enum values.
 
-#### Usage
+### Usage
 
 ```php
 VolumeUnitEnum::values();
@@ -243,11 +300,11 @@ returns
 ]
 ```
 
-### labels
+## `labels()`
 
-Returns an array of all enum labels.
+Returns an array of all enum translations.
 
-#### Usage
+### Usage
 
 ```php
 VolumeUnitEnum::labels();
@@ -265,11 +322,11 @@ returns
 ]
 ```
 
-### dict
+## `dict()`
 
 Returns an array of all enum values mapping to their label.
 
-#### Usage
+### Usage
 
 ```php
 VolumeUnitEnum::dict();
@@ -287,11 +344,11 @@ returns
 ]
 ```
 
-### toArray & toCollection
+## `toArray()` & `toCollection()`
 
-Returns an array of a single enum value with its label and metadata.
+Returns an array or collection of a single enum instance with its label, metadata and alias.
 
-#### Usage
+### Usage
 
 ```php
 VolumeUnitEnum::MILLIGRAMS->toArray();
@@ -312,11 +369,11 @@ returns
 ]
 ```
 
-### toHtml
+## `toHtml()`
 
 An alias of ::label(). Used to satisfy Laravel's Htmlable interface.
 
-#### Usage
+### Usage
 
 ```php
 VolumeUnitEnum::MILLIGRAMS->toHtml();
@@ -328,68 +385,69 @@ returns
 mg
 ```
 
-### toJson
+## `toJson()`
 
-Returns a json string represention of the toArray return value.
+Returns a json string represention of the `toArray()` return value.
 
-### is/isA/isAn
+## `is()`, `isA()` and `isAn()`
 
 Allows you to check if an enum is a given value. Returns a boolean.
 > **Note**
 > `isA`, `isAn` are just aliases for `is`.
 
-#### Usage
+### Usage
 
 ```php
-VolumeUnitEnum::MILLIGRAMS->is(VolumeUnitEnum::MILLIGRAMS); //true
-VolumeUnitEnum::MILLIGRAMS->is('MILLIGRAMS');               //true
-VolumeUnitEnum::MILLIGRAMS->is('invalid');                  //exception
+VolumeUnitEnum::MILLIGRAMS->is(VolumeUnitEnum::MILLIGRAMS); // true
+VolumeUnitEnum::MILLIGRAMS->is('MILLIGRAMS');               // true
+VolumeUnitEnum::MILLIGRAMS->is('invalid');                  // false
 ```
 
-### isNot/isNotA/isNotAn
+## `isNot()`, `isNotA()` and `isNotAn()`
 
 Allows you to check if an enum is not a given value. Returns a boolean.
 > **Note**
 > `isNotA` and `isNotAn` are just aliases for `isNot`.
 
-#### Usage
+### Usage
 
 ```php
-VolumeUnitEnum::MILLIGRAMS->isNot(VolumeUnitEnum::GRAMS); //true
-VolumeUnitEnum::MILLIGRAMS->isNot('GRAMS');               //true
-VolumeUnitEnum::MILLIGRAMS->isNot('invalid');             //exception
+VolumeUnitEnum::MILLIGRAMS->isNot(VolumeUnitEnum::GRAMS); // true
+VolumeUnitEnum::MILLIGRAMS->isNot('GRAMS');               // true
+VolumeUnitEnum::MILLIGRAMS->isNot('invalid');             // true
+VolumeUnitEnum::MILLIGRAMS->isNot('MILLIGRAMS');          // false
 ```
 
-### isAny
+## `isAny()`
 
 Allows you to check if an enum is contained in an array. Returns a boolean.
 
-#### Usage
+### Usage
 
 ```php
 VolumeUnitEnum::MILLIGRAMS->isAny(['GRAMS', VolumeUnitEnum::TONNE]);                    // false
 VolumeUnitEnum::MILLIGRAMS->isAny([VolumeUnitEnum::GRAMS, VolumeUnitEnum::MILLIGRAMS]); // true
 ```
 
-### isNotAny
+## `isNotAny()`
 
 Allows you to check if an enum is not contained in an array. Returns a boolean.
 
-#### Usage
+### Usage
 
 ```php
 VolumeUnitEnum::MILLIGRAMS->isNotAny(['GRAMS', VolumeUnitEnum::TONNE]);                    // true
 VolumeUnitEnum::MILLIGRAMS->isNotAny([VolumeUnitEnum::GRAMS, VolumeUnitEnum::MILLIGRAMS]); // false
 ```
 
-### rule
+## `rule()`
 
 The enums may be validated using Laravel's standard Enum validation rule - `new Illuminate\Validation\Rules\Enum(VolumeUnitEnum::class)`.  
-This method a shortcut for the validation rule.
+This method a shortcut for the validation rule. It supports specifying excluded cases.
 
-#### Usage
+### Usage
 
-```
+```php
 public function rules(): array
 {
     return [
@@ -398,9 +456,66 @@ public function rules(): array
 }
 ```
 
-## Other Classes
+## `matches()`
 
-### AsFullEnumCollection
+Find all matches and their respective levenshtein distance for a given input string. Can be used to determine what case is the closest match to the input string.
+
+```php
+VolumeUnitEnum::matches('ton');
+```
+returns
+
+```php
+[
+    [
+        'case' => VolumeUnitEnum::TONNE,
+        'distance' => 2,
+    ],
+]
+```
+
+## `parse()`
+
+Allows parsing any string value or enum instance to an enum instance. This method makes use of the `matches()` method in order to find the case with the closest distance. It also takes into account all defined `alias()`.
+
+```php
+TODO
+```
+returns 
+
+```php
+TODO
+```
+## `select()`
+
+Highly customizable method to get data for select components.
+
+```php
+/**
+* Parse this enums values into a valid format for select components.
+*
+* @param  null|string|self|array|Collection  $selected  The currently selected case(s).
+* @param  null|string|self|array|Collection  $exclude  What enum case(s) should not be included.
+* @param  null|string|Closure  $translation  When null the label() method is used. When a string, it uses the string value as a base translation path. When a closure, the result of the closure will be used.
+* @param  string[]|Closure[]  $columns  Any additional columns to add to the result. Strings can be method or property names on the enum, closures will be called and the return value is used.
+*/
+public static function select(
+    null|string|self|array|Collection $selected = null, 
+    null|string|self|array|Collection $exclude = null, 
+    null|string|Closure $translation = null, 
+    string|Closure ...$columns): array
+```
+The `$selected` parameter determines which value(s) are currently selected. For a single select this is the case value of the enum instance. For a multiselect it is an array of case values of the enum instance.
+
+The `$exclude` parameter should be either null, a string or enum instance or an array or collection of those. The provided case(s) will not be included in the result.
+
+The `$translation` parameter is either a string referring to a method or property on the enum instance or a closure that gets the current string case and returns the actual string that should be used as the label. By default it will load the `label()` of the each enum case.
+
+The `$columns` parameters are either strings referring to a method or property on the enum instance, or closures that should additionally be included in the resulting array data. 
+
+# Other Classes
+
+## AsFullEnumCollection
 
 This cast is similar to the Laravel built in `AsEnumCollection` cast but unlike the built-in will maintain the full `toArray` structure
 when converting to json.
@@ -425,7 +540,10 @@ This cast will return
         "meta": {
             "background_color": "bg-green-100",
             "text_color": "text-green-800"
-        }
+        },
+        "alias": [
+            "mg"
+        ],
     },
     {
         "name": "GRAMS",
@@ -434,7 +552,10 @@ This cast will return
         "meta": {
             "background_color": "bg-red-100",
             "text_color": "text-red-800"
-        }
+        },
+        "alias": [
+            "g"
+        ],
     }
 ]
 ```

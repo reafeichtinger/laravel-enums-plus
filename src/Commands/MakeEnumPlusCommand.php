@@ -1,13 +1,16 @@
 <?php
 
-namespace Rea\LaravelEnumsPlus;
+namespace Rea\LaravelEnumsPlus\Commands;
 
 use Illuminate\Foundation\Console\EnumMakeCommand;
 use InvalidArgumentException;
+use Symfony\Component\Console\Attribute\AsCommand;
 
-class LaravelEnumsPlusMakeCommand extends EnumMakeCommand
+#[AsCommand(name: 'make:enum-plus')]
+class MakeEnumPlusCommand extends EnumMakeCommand
 {
-    protected $description = 'Create a new laravel enum';
+    protected $name = 'make:enum-plus';
+    protected $description = 'Create a new supercharged laravel enum';
 
     protected function getStub(): string
     {
@@ -38,8 +41,8 @@ class LaravelEnumsPlusMakeCommand extends EnumMakeCommand
             return $customPath;
         }
 
-        if (file_exists(__DIR__ . '/../' . $stub)) {
-            return __DIR__ . '/../' . $stub;
+        if (file_exists(__DIR__ . '/../../' . $stub)) {
+            return __DIR__ . '/../../' . $stub;
         }
 
         return parent::resolveStubPath($stub);

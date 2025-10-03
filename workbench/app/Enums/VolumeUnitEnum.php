@@ -36,20 +36,43 @@ enum VolumeUnitEnum: string implements EnumPlus
         };
     }
 
+    public function withAlias(): array
+    {
+        return match ($this) {
+            self::MILLIGRAMS => ['mg'],
+            self::GRAMS => ['g'],
+            self::KILOGRAMS => ['kg'],
+            self::TONNE => ['t'],
+            default => [],
+        };
+    }
+
+    public function defaultCount(): int
+    {
+        return 0;
+    }
+
+    public function defaultReplace(): array
+    {
+        return [
+            'of' => 'butter',
+        ];
+    }
+
     public function translations(): array
     {
         return [
             'en' => [
-                self::GRAMS->value => ':count gram|:count grams',
-                self::MILLIGRAMS->value => ':count milligram|:count milligrams',
-                self::KILOGRAMS->value => ':count kilogram|:count kilograms',
-                self::TONNE->value => ':count tonne|:count tonnes',
+                self::GRAMS->value => ':count gram of :of|:count grams of :of',
+                self::MILLIGRAMS->value => ':count milligram of :of|:count milligrams of :of',
+                self::KILOGRAMS->value => ':count kilogram of :of|:count kilograms of :of',
+                self::TONNE->value => ':count tonne of :of|:count tonnes of :of',
             ],
             'de' => [
-                self::GRAMS->value => ':count Gram|:count Gram',
-                self::MILLIGRAMS->value => ':count Milligram|:count Milligram',
-                self::KILOGRAMS->value => ':count Kilogram|:count Kilogram',
-                self::TONNE->value => ':count Tonne|:count Tonnen',
+                self::GRAMS->value => ':count Gram :Of|:count Gram :Of',
+                self::MILLIGRAMS->value => ':count Milligram :Of|:count Milligram :Of',
+                self::KILOGRAMS->value => ':count Kilogram :Of|:count Kilogram :Of',
+                self::TONNE->value => ':count Tonne :Of|:count Tonnen :Of',
             ],
         ];
     }

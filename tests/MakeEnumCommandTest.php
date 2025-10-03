@@ -10,7 +10,7 @@ it('can create an enum', function () {
 
     File::delete(workbench_path('app/Enums/TestEnum.php'));
 
-    artisan('make:enum TestEnum -s')
+    artisan('make:enum-plus TestEnum -s')
         ->execute();
 
     expect(workbench_path('app/Enums/TestEnum.php'))->toBeFile();
@@ -22,7 +22,7 @@ it('can make pure enum', function () {
 
     File::delete(workbench_path('app/Enums/PureEnum.php'));
 
-    artisan('make:enum PureEnum')
+    artisan('make:enum-plus PureEnum')
         ->execute();
 
     expect(workbench_path('app/Enums/PureEnum.php'))->toBeFile();
@@ -39,7 +39,7 @@ it('can make string enum', function () {
 
     File::delete(workbench_path('app/Enums/StringEnum.php'));
 
-    artisan('make:enum StringEnum --string')
+    artisan('make:enum-plus StringEnum --string')
         ->execute();
 
     expect(workbench_path('app/Enums/StringEnum.php'))->toBeFile();
@@ -56,7 +56,7 @@ it('can make int enum', function () {
 
     File::delete(workbench_path('app/Enums/IntEnum.php'));
 
-    artisan('make:enum IntEnum --int')
+    artisan('make:enum-plus IntEnum --int')
         ->execute();
 
     expect(workbench_path('app/Enums/IntEnum.php'))->toBeFile();

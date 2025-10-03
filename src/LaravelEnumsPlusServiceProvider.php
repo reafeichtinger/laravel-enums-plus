@@ -2,7 +2,7 @@
 
 namespace Rea\LaravelEnumsPlus;
 
-use Illuminate\Foundation\Console\EnumMakeCommand;
+use Rea\LaravelEnumsPlus\Commands\MakeEnumPlusCommand;
 use Spatie\LaravelPackageTools\Package;
 use Spatie\LaravelPackageTools\PackageServiceProvider;
 
@@ -17,11 +17,7 @@ class LaravelEnumsPlusServiceProvider extends PackageServiceProvider
          */
         $package
             ->name('laravel-enums-plus')
-            ->hasConfigFile();
-
-        /** @noinspection PhpFullyQualifiedNameUsageInspection */
-        if (class_exists(EnumMakeCommand::class)) {
-            $package->hasConsoleCommand(LaravelEnumsPlusMakeCommand::class);
-        }
+            ->hasConfigFile('enums-plus')
+            ->hasCommand(MakeEnumPlusCommand::class);
     }
 }

@@ -9,7 +9,17 @@ return [
     'translations' => 'enums',
 
     /**
-     * Define the column names used by the selection() method.
+     * Define the default count used for translations.
+     */
+    'default_count' => 1,
+
+    /**
+     * Define the default replace data used for translations.
+     */
+    'default_replace' => [],
+
+    /**
+     * Define the column names used by the select() method.
      */
     'columns' => [
         'value' => 'value',

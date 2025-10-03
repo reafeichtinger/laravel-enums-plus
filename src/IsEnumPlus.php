@@ -47,8 +47,8 @@ trait IsEnumPlus
     {
         static::ensureImplementsInterface();
 
-        return Collection::make(static::cases())->when($exclude, function ($cases) use ($exclude) {
-            return $cases->filter(fn ($enum) => is_array($exclude) ? $enum->isNotAny($exclude) : $enum->isNot($exclude))->values();
+        return Collection::make(static::cases())->when($exclude, function (Collection $cases) use ($exclude) {
+            return $cases->filter(fn (self $enum) => is_array($exclude) ? $enum->isNotAny($exclude) : $enum->isNot($exclude))->values();
         });
     }
 
@@ -57,7 +57,7 @@ trait IsEnumPlus
      */
     public static function optionsC(null|string|self|array|Collection $exclude = null): Collection
     {
-        return static::casesC($exclude)->map(fn ($enum) => $enum->toCollection());
+        return static::casesC($exclude)->map(fn (self $enum) => $enum->toCollection());
     }
 
     /**
@@ -73,7 +73,7 @@ trait IsEnumPlus
      */
     public static function namesC(null|string|self|array|Collection $exclude = null): Collection
     {
-        return static::casesC($exclude)->map(fn ($enum) => $enum->name);
+        return static::casesC($exclude)->map(fn (self $enum) => $enum->name);
     }
 
     /**
@@ -81,7 +81,7 @@ trait IsEnumPlus
      */
     public static function names(null|string|self|array|Collection $exclude = null): array
     {
-        return static::casesC($exclude)->map(fn ($enum) => $enum->name)->toArray();
+        return static::namesC($exclude)->toArray();
     }
 
     /**
@@ -89,7 +89,7 @@ trait IsEnumPlus
      */
     public static function valuesC(null|string|self|array|Collection $exclude = null): Collection
     {
-        return static::casesC($exclude)->map(fn ($enum) => $enum->value);
+        return static::casesC($exclude)->map(fn (self $enum) => $enum->value);
     }
 
     /**
@@ -105,7 +105,7 @@ trait IsEnumPlus
      */
     public static function dictC(null|string|self|array|Collection $exclude = null): Collection
     {
-        return static::casesC($exclude)->mapWithKeys(function ($enum) {
+        return static::casesC($exclude)->mapWithKeys(function (self $enum) {
             return [$enum->value => $enum->label()];
         });
     }
@@ -115,39 +115,45 @@ trait IsEnumPlus
      */
     public static function dict(null|string|self|array|Collection $exclude = null): array
     {
-        return static::casesC($exclude)->mapWithKeys(function ($enum) {
-            return [$enum->value => $enum->label()];
-        })->toArray();
+        return static::dictC($exclude)->toArray();
     }
 
     /**
      * Get all matching translations, neatly wrapped in a Collection.
      */
-    public static function labelsC(null|string|self|array|Collection $exclude = null, Countable|int|float|array $number = 1, array $replace = []): Collection
+    public static function labelsC(null|string|self|array|Collection $exclude = null, null|Countable|int|float|array $number = null, ?array $replace = null): Collection
     {
-        return static::casesC($exclude)->map(fn ($enum) => static::labelFor(value: $enum, number: $number, replace: $replace));
+        return static::casesC($exclude)->map(fn (self $enum) => static::labelFor(
+            value: $enum,
+            number: $number,
+            replace: $replace,
+        ));
     }
 
     /**
      * Get all matching translations.
      */
-    public static function labels(null|string|self|array|Collection $exclude = null, Countable|int|float|array $number = 1, array $replace = []): array
+    public static function labels(null|string|self|array|Collection $exclude = null, null|Countable|int|float|array $number = null, ?array $replace = null): array
     {
-        return static::casesC($exclude)->map(fn ($enum) => static::labelFor(value: $enum, number: $number, replace: $replace))->toArray();
+        return static::labelsC($exclude, $number, $replace)->toArray();
     }
 
     /**
      * Get the translation for the given enum case. Supports pluralizations and placeholders.
      */
-    public static function labelFor(self $value, Countable|int|float|array $number = 1, array $replace = []): string
+    public static function labelFor(self $value, null|Countable|int|float|array $number = null, ?array $replace = null): string
     {
         static::ensureImplementsInterface();
 
+        $number = $number ?? $value->defaultCount() ?? config('enums-plus.default_count');
+        $replace = $replace ?? $value->defaultReplace() ?? config('enums-plus.default_replace');
+        // dd($number, $replace);
         // If translations are defined in the enum and the requested key exists for the current locale
         if (method_exists($value, 'translations') && array_key_exists($value->value, $value->translations()[app()->getLocale()] ?? [])) {
             return app('translator')->choice(
-                $value->translations()[app()->getLocale()][$value->value] ??
-                $value->value, $number, $replace
+                $value->translations()[app()->getLocale()][$value->value] ?? $value->value,
+                $number,
+                $replace,
             );
         }
 
@@ -160,6 +166,14 @@ trait IsEnumPlus
         );
 
         return app('translator')->has($langKey) ? trans_choice($langKey, $number, $replace) : $value->value;
+    }
+
+    /**
+     * Get the translation for the given enum case. Supports pluralizations and placeholders.
+     */
+    public static function transFor(self $value, null|Countable|int|float|array $number = null, ?array $replace = null): string
+    {
+        return static::labelFor($value, $number, $replace);
     }
 
     /**
@@ -180,7 +194,7 @@ trait IsEnumPlus
      * @param  null|string|Closure  $translation  When null the label() method is used. When a string, it uses the string value as a base translation path. When a closure, the result of the closure will be used.
      * @param  string[]|Closure[]  $columns  Any additional columns to add to the result. Strings can be method or property names on the enum, closures will be called and the return value is used.
      */
-    public static function selectionC(null|string|self|array|Collection $selected = null, null|string|self|array|Collection $exclude = null, null|string|Closure $translation = null, string|Closure ...$columns): Collection
+    public static function selectC(null|string|self|array|Collection $selected = null, null|string|self|array|Collection $exclude = null, null|string|Closure $translation = null, string|Closure ...$columns): Collection
     {
         return static::casesC($exclude)->map(function (self $case) use ($selected, $translation, $columns) {
 
@@ -210,7 +224,7 @@ trait IsEnumPlus
             }
 
             // Remove actual null values and empty strings
-            return array_filter($result, fn ($e) => $e !== null && (!is_string($e) || (is_string($e) && trim($e) !== '')));
+            return array_filter($result, fn (mixed $e) => $e !== null && (!is_string($e) || (is_string($e) && trim($e) !== '')));
         })->values();
     }
 
@@ -222,9 +236,76 @@ trait IsEnumPlus
      * @param  null|string|Closure  $translation  When null the label() method is used. When a string, it uses the string value as a base translation path. When a closure, the result of the closure will be used.
      * @param  string[]|Closure[]  $columns  Any additional columns to add to the result. Strings can be method or property names on the enum, closures will be called and the return value is used.
      */
-    public static function selection(null|string|self|array|Collection $selected = null, null|string|self|array|Collection $exclude = null, null|string|Closure $translation = null, string|Closure ...$columns): array
+    public static function select(null|string|self|array|Collection $selected = null, null|string|self|array|Collection $exclude = null, null|string|Closure $translation = null, string|Closure ...$columns): array
     {
-        return static::selectionC($selected, $exclude, $translation, ...$columns)->toArray();
+        return static::selectC($selected, $exclude, $translation, ...$columns)->toArray();
+    }
+
+    /**
+     * Get all matching cases including the calculated Levenshtein distance to the given $input, neatly wrapped in a Collection.
+     *
+     * @param  string|self  $input  The string that should be matched.
+     */
+    public static function matchesC(string|self $input): Collection
+    {
+        static::ensureImplementsInterface();
+        $inputNormalized = Str::slug(trim($input), '');
+
+        if ($input instanceof self || ($input = static::tryFrom($inputNormalized))) {
+            return Collection::make([Collection::make(['case' => $input->toArray(), 'distance' => 0])]);
+        }
+
+        // Find all cases with direct string matches
+        $matches = static::casesC()->filter(function (self $case) use ($inputNormalized) {
+            return Collection::make($case->withAlias())
+                // Check all name, value, label AND all aliases of the case
+                ->add($case->value)
+                ->add($case->name)
+                ->add($case->label())
+                // Normalize aliases and value
+                ->map(fn (string $alias) => Str::slug(trim($alias)))
+                // Filter out duplicates
+                ->unique()
+                // Filter out everything that doesn't match our input
+                ->filter(fn (string $alias) => Str::contains($alias, $inputNormalized) || Str::contains($inputNormalized, $alias))
+                // If we have at lease one entry left, then this case matches the input
+                ->count() > 0;
+        });
+
+        // In case we couldn't find any direct matches, use all cases for the distance calculation
+        if ($matches->count() === 0) {
+            $matches = static::casesC();
+        }
+
+        // Calculate levenshtein distance
+        return $matches->map(function (self $case) use ($inputNormalized) {
+            $caseNormalized = Str::slug(trim($case->value));
+            $distance = levenshtein($inputNormalized, $caseNormalized);
+
+            return Collection::make(['case' => $case->toArray(), 'distance' => $distance]);
+        })->sortBy('distance')->values();
+    }
+
+    /**
+     * Get all matching cases including the calculated Levenshtein distance to the given $input.
+     *
+     * @param  string|self  $input  The string that should be matched.
+     */
+    public static function matches(string|self $input): array
+    {
+        return static::matchesC($input)->toArray();
+    }
+
+    /**
+     * Parse any string to the closest matching enum value.
+     *
+     * NOTE: This uses Levenshtein distance to calculate the closest match as a last resort which can produce strange results.
+     *
+     * @param  string|self  $input  The string that should be matched to an enum case.
+     */
+    public static function parse(string|self $input): static
+    {
+        return static::tryFrom(Arr::get(static::matchesC($input)->first(), 'case.value', default: self::casesC()->first()->value));
     }
 
     #endregion static
@@ -233,19 +314,17 @@ trait IsEnumPlus
     /**
      * Get the translation for the current enum case. Supports pluralizations and placeholders.
      */
-    public function label(Countable|int|float|array $number = 1, array $replace = []): string
+    public function label(null|Countable|int|float|array $number = null, ?array $replace = null): string
     {
         return static::labelFor(value: $this, number: $number, replace: $replace);
     }
 
     /**
-     * Definition of what metadata should be included, empty array by default.
+     * Get the translation for the current enum case. Supports pluralizations and placeholders.
      */
-    public function withMeta(): array
+    public function trans(null|Countable|int|float|array $number = null, ?array $replace = null): string
     {
-        static::ensureImplementsInterface();
-
-        return [];
+        return static::labelFor(value: $this, number: $number, replace: $replace);
     }
 
     /**
@@ -260,6 +339,7 @@ trait IsEnumPlus
             'value' => $this->value,
             'label' => $this->label(),
             'meta' => $this->withMeta(),
+            'alias' => $this->withAlias(),
         ];
     }
 
@@ -328,7 +408,7 @@ trait IsEnumPlus
             return false;
         }
 
-        $values = array_map(fn ($value) => $value instanceof static ? $value : static::tryFrom(strtolower($value)), $values);
+        $values = array_map(fn (string|self $value) => $value instanceof self ? $value : static::tryFrom(strtolower($value)), $values);
 
         return in_array($this, $values);
     }
@@ -366,4 +446,39 @@ trait IsEnumPlus
     }
 
     #endregion instance
+    #region overwritable
+
+    /**
+     * The default count that should be used in translations. If not specified it's 1.
+     */
+    public function defaultCount(): Countable|int|float|array
+    {
+        return 1;
+    }
+
+    /**
+     * The default replacement array that should be used in translations. If not specified it's [].
+     */
+    public function defaultReplace(): array
+    {
+        return [];
+    }
+
+    /**
+     * Definition of what metadata should be included, empty array by default.
+     */
+    public function withMeta(): array
+    {
+        return [];
+    }
+
+    /**
+     * Definitions of aliases for each case. Can be used to improve parsing.
+     */
+    public function withAlias(): array
+    {
+        return [];
+    }
+
+    #endregion overwritable
 }
