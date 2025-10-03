@@ -9,8 +9,5 @@ enum StringEnum: string implements EnumPlus
 {
     use IsEnumPlus;
 
-    /**
-     * Add your Enums below using.
-     * e.g. case Standard = 'standard';
-     */
+    //
 }

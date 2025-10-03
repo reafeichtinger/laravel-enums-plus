@@ -9,8 +9,5 @@ enum {{ class }}: {{ type }} implements EnumPlus
 {
     use IsEnumPlus;
 
-    /**
-     * Add your Enums below using.
-     * e.g. case Standard = {{ value }};
-     */
+    //
 }

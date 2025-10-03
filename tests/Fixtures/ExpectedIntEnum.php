@@ -9,8 +9,5 @@ enum IntEnum: int implements EnumPlus
 {
     use IsEnumPlus;
 
-    /**
-     * Add your Enums below using.
-     * e.g. case Standard = 0;
-     */
+    //
 }

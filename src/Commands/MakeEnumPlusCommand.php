@@ -2,41 +2,61 @@
 
 namespace Rea\LaravelEnumsPlus\Commands;
 
-use Illuminate\Foundation\Console\EnumMakeCommand;
-use InvalidArgumentException;
+use Illuminate\Console\GeneratorCommand;
+use Illuminate\Contracts\Filesystem\FileNotFoundException;
 use Symfony\Component\Console\Attribute\AsCommand;
+use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
+use Symfony\Component\Console\Output\OutputInterface;
+
+use function Laravel\Prompts\select;
 
 #[AsCommand(name: 'make:enum-plus')]
-class MakeEnumPlusCommand extends EnumMakeCommand
+class MakeEnumPlusCommand extends GeneratorCommand
 {
+    /**
+     * The console command name.
+     *
+     * @var string
+     */
     protected $name = 'make:enum-plus';
-    protected $description = 'Create a new supercharged laravel enum';
 
-    protected function getStub(): string
+    /**
+     * The console command description.
+     *
+     * @var string
+     */
+    protected $description = 'Create a new enum';
+
+    /**
+     * The type of class being generated.
+     *
+     * @var string
+     */
+    protected $type = 'Enum';
+
+    /**
+     * Get the stub file for the generator.
+     *
+     * @return string
+     */
+    protected function getStub()
     {
         if ($this->option('string') || $this->option('int')) {
             return $this->resolveStubPath('/stubs/laravel-enums-plus.stub');
         }
 
-        return parent::getStub();
+        return $this->resolveStubPath('/stubs/enum.stub');
     }
 
-    protected function buildClass($name): array|string
+    /**
+     * Resolve the fully-qualified path to the stub.
+     *
+     * @param  string  $stub
+     * @return string
+     */
+    protected function resolveStubPath($stub)
     {
-        if ($this->option('string') || $this->option('int')) {
-            return str_replace(
-                ['{{ value }}'],
-                $this->option('string') ? '\'standard\'' : '0',
-                parent::buildClass($name)
-            );
-        }
-
-        return parent::buildClass($name);
-    }
-
-    protected function resolveStubPath($stub): string
-    {
-
         if (file_exists($customPath = $this->laravel->basePath(trim($stub, '/')))) {
             return $customPath;
         }
@@ -48,17 +68,75 @@ class MakeEnumPlusCommand extends EnumMakeCommand
         return parent::resolveStubPath($stub);
     }
 
-    protected function getNameInput(): string
+    /**
+     * Get the default namespace for the class.
+     *
+     * @param  string  $rootNamespace
+     * @return string
+     */
+    protected function getDefaultNamespace($rootNamespace)
     {
-        $name = trim($this->argument('name'));
-        if (!preg_match('/^[A-Za-z_\x7f-\xff][A-Za-z0-9_\x7f-\xff]*$/', $name)) {
-            throw new InvalidArgumentException('Invalid enum name format');
+        return match (true) {
+            is_dir(app_path('Enums')) => $rootNamespace . '\\Enums',
+            is_dir(app_path('Enumerations')) => $rootNamespace . '\\Enumerations',
+            default => $rootNamespace,
+        };
+    }
+
+    /**
+     * Build the class with the given name.
+     *
+     * @param  string  $name
+     * @return string
+     *
+     * @throws FileNotFoundException
+     */
+    protected function buildClass($name)
+    {
+        if ($this->option('string') || $this->option('int')) {
+            return str_replace(
+                ['{{ type }}'],
+                $this->option('string') ? 'string' : 'int',
+                parent::buildClass($name)
+            );
         }
 
-        if (str_ends_with($name, 'Enum')) {
-            return $name;
+        return parent::buildClass($name);
+    }
+
+    /**
+     * Interact further with the user if they were prompted for missing arguments.
+     *
+     * @return void
+     */
+    protected function afterPromptingForMissingArguments(InputInterface $input, OutputInterface $output)
+    {
+        if ($this->didReceiveOptions($input)) {
+            return;
         }
 
-        return $name . 'Enum';
+        $type = select('Which type of enum would you like?', [
+            'pure' => 'Pure enum',
+            'string' => 'Backed enum (String)',
+            'int' => 'Backed enum (Integer)',
+        ]);
+
+        if ($type !== 'pure') {
+            $input->setOption($type, true);
+        }
+    }
+
+    /**
+     * Get the console command arguments.
+     *
+     * @return array
+     */
+    protected function getOptions()
+    {
+        return [
+            ['string', 's', InputOption::VALUE_NONE, 'Generate a string backed enum.'],
+            ['int', 'i', InputOption::VALUE_NONE, 'Generate an integer backed enum.'],
+            ['force', 'f', InputOption::VALUE_NONE, 'Create the enum even if the enum already exists'],
+        ];
     }
 }
