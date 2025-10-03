@@ -2,6 +2,19 @@
 
 All notable changes to `laravel-enums-plus` will be documented in this file.
 
+## v3.2.0 - 2025-10-03
+
+### What's Changed
+
+* Rename enum creation command and move it to the correct path.
+* Add `trans()` and `transFor()` methods as an alias to `label()`.
+* Add config values `defaultCount` and `defaultReplace` to specify default values used for translations.
+* Rename `selection()` and `selectionC()` methods to `select()` and `selectC()` respectively.
+* Add `matches()` and `matchesC()` methods to find closest matching enum cases for an input string.
+* Add `parse()` method to get the closest matching enum case for any input string.
+* Add `withAlias()` method to add additional valid aliases for each enum case (used by the `parse()` method).
+* Add some more type hints.
+
 ## v3.1.0 - 2025-09-28
 
 ### What's Changed
