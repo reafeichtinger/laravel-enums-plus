@@ -16,7 +16,7 @@ composer require reafeichtinger/laravel-enums-plus
 You might want to overwrite some default settings. You can pushlish the config for further editing with this command.
 
 ```bash
-php artisan vendor:publish --tag=laravel-enums-plus-config
+php artisan vendor:publish --tag=enums-plus-config
 ```
 
 # Creating a new enum class with the `make:enum` Command
